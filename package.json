@@ -1,0 +1,25 @@
+{
+  "name": "ryzenpanel",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "pnpm --filter @ryzenpanel/dashboard dev",
+    "build": "pnpm --filter @ryzenpanel/dashboard build && pnpm --filter @ryzenpanel/daemon build",
+    "start": "pnpm --filter @ryzenpanel/dashboard start",
+    "lint": "pnpm --filter @ryzenpanel/dashboard lint",
+    "prisma:validate": "prisma validate --schema prisma/schema.prisma",
+    "prisma:generate": "prisma generate --schema prisma/schema.prisma",
+    "prisma:push": "prisma db push --schema prisma/schema.prisma",
+    "seed": "tsx scripts/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "5.22.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.0.0",
+    "tsx": "^4.22.4",
+    "typescript": "^5.9.3"
+  }
+}
