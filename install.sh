@@ -26,7 +26,7 @@ banner() {
   echo ''
 }
 
-# Auto mode (called with --wings flag from panel-generated command)
+# Auto mode (called with --daemon flag from panel-generated command)
 AUTO_MODE=false
 PANEL_URL=""
 NODE_UUID=""
@@ -36,7 +36,7 @@ DAEMON_FQDN=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --wings) AUTO_MODE=true ;;
+    --daemon) AUTO_MODE=true ;;
     --panel-url=*) PANEL_URL="${1#*=}" ;;
     --node-uuid=*) NODE_UUID="${1#*=}" ;;
     --node-secret=*) NODE_SECRET="${1#*=}" ;;
@@ -47,8 +47,8 @@ while [[ $# -gt 0 ]]; do
       echo "Usage: bash install.sh [options]"
       echo ""
       echo "Options:"
-      echo "  --wings              Install Wings daemon in non-interactive mode"
-      echo "  --panel-url=URL      Panel URL (for Wings mode)"
+      echo "  --daemon             Install RyzenDaemon in non-interactive mode"
+      echo "  --panel-url=URL      Panel URL (for daemon mode)"
       echo "  --node-uuid=UUID     Node UUID from panel"
       echo "  --node-secret=SECRET Node secret from panel"
       echo "  --daemon-key=KEY     Daemon API key from panel"
@@ -63,7 +63,7 @@ done
 banner
 echo '╔══════════════════════════════════════════════════════════════╗'
 echo '║        Next-Generation Minecraft Hosting Panel v1.0         ║'
-echo '║       One-Click Installer — Panel + Wings Daemon            ║'
+echo '║       One-Click Installer — Panel + RyzenDaemon            ║'
 echo '╚══════════════════════════════════════════════════════════════╝'
 echo ''
 echo "  📦 Version: $RYZEN_VERSION"
@@ -100,8 +100,8 @@ else
   echo '║              Choose Installation Mode                       ║'
   echo '╠══════════════════════════════════════════════════════════════╣'
   echo '║  1) Install Panel (Web UI + API)                           ║'
-  echo '║  2) Install Wings Daemon (Game Server Node)                 ║'
-  echo '║  3) Install Both (Panel + Wings on same server)            ║'
+  echo '║  2) Install RyzenDaemon (Game Server Node)                 ║'
+  echo '║  3) Install Both (Panel + Daemon on same server)           ║'
   echo '╚══════════════════════════════════════════════════════════════╝'
   echo ''
   read -p "Select option [1-3]: " INSTALL_MODE
@@ -253,7 +253,7 @@ fi
 
 if [[ "$INSTALL_MODE" == "2" ]] || [[ "$INSTALL_MODE" == "3" ]]; then
   echo '╔══════════════════════════════════════════════════════════════╗'
-  echo '║                Wings Daemon Configuration                   ║'
+  echo '║              RyzenDaemon Configuration                     ║'
   echo '╚══════════════════════════════════════════════════════════════╝'
   echo ''
 
@@ -286,7 +286,7 @@ SQLEOF
     echo "  Node UUID: ${NODE_UUID}"
     echo "  Daemon Key: ${DAEMON_KEY}"
     echo "  Node Secret: ${NODE_SECRET}"
-    echo '  Note: Update FQDN to your public IP in Admin → Nodes for Minecraft clients.'
+    echo '  Note: Update FQDN to your public IP in Admin -> Nodes for Minecraft clients.'
     echo ''
   else
     read -p "Panel URL (e.g., https://panel.example.com): " PANEL_URL
@@ -352,7 +352,7 @@ DAEMONENV
 
   cat > /etc/systemd/system/ryzenpanel-daemon.service << SERVICEEOF
 [Unit]
-Description=RyzenPanel Wings Daemon
+Description=RyzenPanel RyzenDaemon
 After=docker.service
 Requires=docker.service
 
@@ -390,7 +390,7 @@ SERVICEEOF
       2>/dev/null || warn "Auto-registration failed. Register manually in panel."
   fi
 
-  success "Wings Daemon installation complete!"
+  success "RyzenDaemon installation complete!"
   echo ''
   echo "  Daemon URL: http://${DAEMON_FQDN}:8080"
   echo "  Node UUID: ${NODE_UUID}"
@@ -409,8 +409,9 @@ echo '║   ██╔══██╗  ╚██╔╝   ███╔╝   ██
 echo '║   ██║  ██║   ██║   ███████╗███████╗██║ ╚████║██║          ║'
 echo '║   ╚═╝  ╚═╝   ╚═╝   ╚══════╝╚══════╝╚═╝  ╚═══╝╚═╝          ║'
 echo '║                                                             ║'
+echo '║   💬 Support: https://discord.gg/YwXsyh95Q3                ║'
 echo '╚══════════════════════════════════════════════════════════════╝'
 echo ''
 echo "  📖 Documentation: https://github.com/Uiatcg/RyzenPanel"
-echo "  💬 Need help? Open an issue on GitHub"
+echo "  💬 Need help? Join our Discord: https://discord.gg/YwXsyh95Q3"
 echo ''

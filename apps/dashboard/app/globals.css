@@ -40,6 +40,18 @@ body {
   overflow-x: hidden;
 }
 
+/* Lightweight background replacement for canvas */
+.ryzen-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(239,68,68,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(239,68,68,0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 80%, rgba(59,130,246,0.05) 0%, transparent 50%),
+    linear-gradient(180deg, #070714 0%, #0a0a20 30%, #0f0f30 50%, #0a0a18 80%, #050510 100%);
+}
+
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: rgba(15, 15, 35, 0.5); }
 ::-webkit-scrollbar-thumb {

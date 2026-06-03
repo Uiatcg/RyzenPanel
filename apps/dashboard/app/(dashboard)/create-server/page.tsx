@@ -22,38 +22,39 @@ const softwareOptions = [
   { id: "bungeecord", name: "BungeeCord", desc: "Network proxy", icon: "🔗", block: "mc-block-iron", rarity: "common" },
 ];
 
-const versionImages: Record<string, string> = {
-  "1.21": "⚡",
-  "1.20.4": "🏰",
-  "1.19.4": "🗡️",
-  "1.18.2": "⛏️",
-  "1.17.1": "🪨",
-  "1.16.5": "💀",
-  "3.3": "🚀",
-  "3.2": "🚀",
-  "3.1": "🚀",
-};
+interface VersionGroup {
+  era: string;
+  color: string;
+  icon: string;
+  versions: string[];
+}
 
-const versionColors: Record<string, string> = {
-  "1.21": "from-violet-600 to-blue-600",
-  "1.20.4": "from-blue-600 to-cyan-600",
-  "1.19.4": "from-cyan-600 to-emerald-600",
-  "1.18.2": "from-emerald-600 to-green-600",
-  "1.17.1": "from-yellow-600 to-amber-600",
-  "1.16.5": "from-orange-600 to-red-600",
-};
+const versionGroups: VersionGroup[] = [
+  { era: "Modern (1.21.x)", color: "from-violet-600 to-blue-600", icon: "⚡", versions: ["1.21.4", "1.21.3", "1.21.1", "1.21"] },
+  { era: "Trails & Tales (1.20.x)", color: "from-blue-600 to-cyan-600", icon: "🏰", versions: ["1.20.6", "1.20.5", "1.20.4", "1.20.2", "1.20.1", "1.20"] },
+  { era: "The Wild (1.19.x)", color: "from-cyan-600 to-emerald-600", icon: "🗡️", versions: ["1.19.4", "1.19.3", "1.19.2", "1.19.1", "1.19"] },
+  { era: "Caves & Cliffs (1.17-1.18)", color: "from-emerald-600 to-green-600", icon: "⛏️", versions: ["1.18.2", "1.18.1", "1.18", "1.17.1", "1.17"] },
+  { era: "Nether Update (1.16.x)", color: "from-orange-600 to-red-600", icon: "💀", versions: ["1.16.5", "1.16.4", "1.16.3", "1.16.2", "1.16.1", "1.16"] },
+  { era: "Older (1.12-1.15)", color: "from-amber-600 to-yellow-600", icon: "📦", versions: ["1.15.2", "1.14.4", "1.13.2", "1.12.2"] },
+];
 
+const proxyVersionGroups: VersionGroup[] = [
+  { era: "Velocity 3.x", color: "from-cyan-600 to-blue-600", icon: "🚀", versions: ["3.4", "3.3", "3.2", "3.1"] },
+  { era: "Waterfall / BungeeCord", color: "from-blue-600 to-indigo-600", icon: "🌊", versions: ["latest"] },
+];
+
+// Full version lists per software type
 const versions: Record<string, string[]> = {
-  paper: ["1.21", "1.20.4", "1.19.4", "1.18.2", "1.17.1", "1.16.5"],
-  purpur: ["1.21", "1.20.4", "1.19.4", "1.18.2"],
-  spigot: ["1.21", "1.20.4", "1.19.4", "1.18.2", "1.16.5"],
-  vanilla: ["1.21", "1.20.4", "1.19.4", "1.18.2", "1.17.1", "1.16.5"],
-  fabric: ["1.21", "1.20.4", "1.19.4", "1.18.2"],
-  forge: ["1.20.4", "1.19.4", "1.18.2", "1.16.5"],
-  neoforge: ["1.21", "1.20.4"],
-  velocity: ["3.3", "3.2", "3.1"],
-  waterfall: ["1.21", "1.20", "1.19"],
-  bungeecord: ["1.21", "1.20", "1.19"],
+  paper: ["1.21.4", "1.21.3", "1.21.1", "1.21", "1.20.6", "1.20.5", "1.20.4", "1.20.2", "1.20.1", "1.20", "1.19.4", "1.19.3", "1.19.2", "1.19.1", "1.19", "1.18.2", "1.18.1", "1.18", "1.17.1", "1.17", "1.16.5", "1.16.4", "1.16.3", "1.16.2", "1.16.1", "1.16", "1.15.2", "1.14.4", "1.13.2", "1.12.2"],
+  purpur: ["1.21.4", "1.21.3", "1.21.1", "1.21", "1.20.6", "1.20.5", "1.20.4", "1.20.2", "1.20.1", "1.20", "1.19.4", "1.19.3", "1.19.2", "1.19.1", "1.19", "1.18.2", "1.18.1", "1.18", "1.17.1", "1.17", "1.16.5"],
+  spigot: ["1.21.4", "1.21.3", "1.21.1", "1.21", "1.20.6", "1.20.5", "1.20.4", "1.20.2", "1.20.1", "1.20", "1.19.4", "1.19.3", "1.19.2", "1.19.1", "1.19", "1.18.2", "1.18.1", "1.18", "1.17.1", "1.17", "1.16.5", "1.16.4", "1.16.3", "1.16.2", "1.16.1", "1.16", "1.15.2", "1.14.4", "1.13.2", "1.12.2"],
+  vanilla: ["1.21.4", "1.21.3", "1.21.1", "1.21", "1.20.6", "1.20.5", "1.20.4", "1.20.2", "1.20.1", "1.20", "1.19.4", "1.19.3", "1.19.2", "1.19.1", "1.19", "1.18.2", "1.18.1", "1.18", "1.17.1", "1.17", "1.16.5", "1.16.4", "1.16.3", "1.16.2", "1.16.1", "1.16", "1.15.2", "1.14.4", "1.13.2", "1.12.2"],
+  fabric: ["1.21.4", "1.21.3", "1.21.1", "1.21", "1.20.6", "1.20.5", "1.20.4", "1.20.2", "1.20.1", "1.20", "1.19.4", "1.19.3", "1.19.2", "1.19.1", "1.19", "1.18.2", "1.18.1", "1.18", "1.17.1", "1.17", "1.16.5", "1.16.4", "1.16.3", "1.16.2", "1.16.1", "1.16", "1.15.2", "1.14.4"],
+  forge: ["1.20.4", "1.20.1", "1.19.4", "1.19.2", "1.18.2", "1.17.1", "1.16.5", "1.15.2", "1.14.4", "1.13.2", "1.12.2"],
+  neoforge: ["1.21.4", "1.21.3", "1.21.1", "1.21", "1.20.6", "1.20.5", "1.20.4", "1.20.2", "1.20.1"],
+  velocity: ["3.4", "3.3", "3.2", "3.1"],
+  waterfall: ["latest"],
+  bungeecord: ["latest"],
 };
 
 const rarityConfig: Record<string, { color: string; border: string; bg: string }> = {
@@ -248,48 +249,78 @@ export default function CreateServerWizard() {
                 <h2 className="text-lg font-semibold text-white">📦 Minecraft Version</h2>
                 <p className="text-sm text-slate-400">Select version for <strong className="text-ryzen-400">{selectedSoftware?.name}</strong></p>
               </div>
-              <div className="grid gap-3 sm:grid-cols-3">
-                {(versions[software] || ["1.21", "1.20.4", "1.19.4"]).map(v => {
-                  const color = versionColors[v] || "from-slate-600 to-slate-700";
-                  const isSelected = version === v;
-                  return (
-                    <button key={v} onClick={() => setVersion(v)}
-                      className={`relative rounded-xl border p-4 text-center transition-all duration-200 overflow-hidden group ${
-                        isSelected
-                          ? "border-ryzen-500/50 bg-gradient-to-b from-ryzen-500/10 to-transparent shadow-sm shadow-ryzen-500/10 ryzen-glow-sm"
-                          : "border-slate-700/30 hover:border-slate-600/50 bg-slate-900/50 hover:bg-slate-800/50"
-                      }`}
-                    >
-                      {/* Version color stripe */}
-                      <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${color}`} />
-
-                      {/* Minecraft icon for version */}
-                      <div className="text-3xl mb-2">{versionImages[v] || "📦"}</div>
-
-                      <p className={`text-base font-bold ${isSelected ? "text-ryzen-400" : "text-white"}`}>
-                        {v.startsWith("3.") ? v : `1.${v.split(".").slice(1).join(".")}`}
+              {software === "velocity" || software === "waterfall" || software === "bungeecord" ? (
+                <div className="space-y-4">
+                  {proxyVersionGroups.map(group => (
+                    <div key={group.era}>
+                      <p className="text-xs font-medium text-slate-500 mb-2 flex items-center gap-1.5">
+                        <span>{group.icon}</span> {group.era}
                       </p>
-                      <p className="text-[10px] text-slate-500 mt-1">{selectedSoftware?.name}</p>
-
-                      {/* Version flavor text */}
-                      <div className="mt-2 flex items-center justify-center gap-1">
-                        {v === "1.21" && <span className="text-[9px] text-violet-400">✨ Latest</span>}
-                        {v === "1.16.5" && <span className="text-[9px] text-orange-400">🔥 Classic</span>}
-                        {v === "1.20.4" && <span className="text-[9px] text-blue-400">🌳 Stable</span>}
-                        {v === "1.19.4" && <span className="text-[9px] text-cyan-400">🌌 Wild</span>}
-                        {v === "1.18.2" && <span className="text-[9px] text-emerald-400">⛰️ Caves</span>}
-                        {v === "1.17.1" && <span className="text-[9px] text-amber-400">🪨 Mountains</span>}
+                      <div className="grid gap-3 sm:grid-cols-4">
+                        {(versions[software] || ["latest"]).map(v => {
+                          const isSelected = version === v;
+                          return (
+                            <button key={v} onClick={() => setVersion(v)}
+                              className={`relative rounded-xl border p-4 text-center transition-all duration-200 overflow-hidden group ${
+                                isSelected
+                                  ? "border-ryzen-500/50 bg-gradient-to-b from-ryzen-500/10 to-transparent shadow-sm shadow-ryzen-500/10 ryzen-glow-sm"
+                                  : "border-slate-700/30 hover:border-slate-600/50 bg-slate-900/50 hover:bg-slate-800/50"
+                              }`}
+                            >
+                              <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${group.color}`} />
+                              <div className="text-3xl mb-2">{group.icon}</div>
+                              <p className={`text-base font-bold ${isSelected ? "text-ryzen-400" : "text-white"}`}>
+                                {v === "latest" ? "Latest" : v}
+                              </p>
+                              <p className="text-[10px] text-slate-500 mt-1">{selectedSoftware?.name}</p>
+                              {isSelected && (
+                                <div className="absolute -top-1 -right-1 w-5 h-5 bg-ryzen-500 rounded-bl-lg flex items-center justify-center">
+                                  <Check size={10} className="text-white" />
+                                </div>
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
-
-                      {isSelected && (
-                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-ryzen-500 rounded-bl-lg flex items-center justify-center">
-                          <Check size={10} className="text-white" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-5 max-h-[400px] overflow-y-auto pr-1">
+                  {versionGroups.map(group => {
+                    const availableVersions = (versions[software] || []).filter(v => group.versions.includes(v));
+                    if (availableVersions.length === 0) return null;
+                    return (
+                      <div key={group.era}>
+                        <p className="text-xs font-medium text-slate-500 mb-2 flex items-center gap-1.5">
+                          <span>{group.icon}</span> {group.era}
+                        </p>
+                        <div className="grid gap-2 sm:grid-cols-4">
+                          {availableVersions.map(v => {
+                            const isSelected = version === v;
+                            return (
+                              <button key={v} onClick={() => setVersion(v)}
+                                className={`relative rounded-lg border p-3 text-center transition-all duration-200 group ${
+                                  isSelected
+                                    ? "border-ryzen-500/50 bg-gradient-to-b from-ryzen-500/10 to-transparent shadow-sm shadow-ryzen-500/10"
+                                    : "border-slate-700/30 hover:border-slate-600/50 bg-slate-900/50 hover:bg-slate-800/50"
+                                }`}
+                              >
+                                <p className={`text-sm font-bold ${isSelected ? "text-ryzen-400" : "text-white"}`}>{v}</p>
+                                {isSelected && (
+                                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-ryzen-500 rounded-bl-lg flex items-center justify-center">
+                                    <Check size={8} className="text-white" />
+                                  </div>
+                                )}
+                              </button>
+                            );
+                          })}
                         </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
               {selectedSoftware && (
                 <div className="rounded-xl bg-slate-800/30 border border-slate-700/20 px-4 py-3">
@@ -306,7 +337,7 @@ export default function CreateServerWizard() {
             <motion.div key="s3" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-4">
               <div>
                 <h2 className="text-lg font-semibold text-white">🌍 Select Node</h2>
-                <p className="text-sm text-slate-400">Choose which Wings node to deploy on</p>
+                <p className="text-sm text-slate-400">Choose which daemon node to deploy on</p>
               </div>
               {nodes.length === 0 ? (
                 <div className="rounded-xl bg-slate-800/30 border border-slate-700/20 p-8 text-center">

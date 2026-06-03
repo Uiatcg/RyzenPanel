@@ -13,7 +13,7 @@ const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/my-servers", label: "My Servers", icon: Server },
   { href: "/create-server", label: "Create Server", icon: PlusCircle },
-  { href: "/wings", label: "Wings", icon: Radio },
+  { href: "/wings", label: "RyzenDaemon", icon: Radio },
   { href: "/billing", label: "Billing", icon: ShoppingCart },
   { href: "/tickets", label: "Support", icon: Ticket },
   { href: "/settings", label: "Settings", icon: Settings },

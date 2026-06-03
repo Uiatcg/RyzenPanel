@@ -35,7 +35,7 @@ export default function DaemonSettingsPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white">Daemon Configuration</h1>
-            <p className="text-sm text-slate-400 mt-1">Configure Wings daemon connection settings</p>
+            <p className="text-sm text-slate-400 mt-1">Configure RyzenDaemon connection settings</p>
           </div>
         </div>
       </div>
@@ -78,7 +78,7 @@ export default function DaemonSettingsPage() {
           </div>
           <div>
             <h3 className="text-sm font-semibold text-white">Daemon Config File</h3>
-            <p className="text-xs text-slate-500">Example configuration for wings.yml</p>
+            <p className="text-xs text-slate-500">Example configuration for ryzendaemon</p>
           </div>
         </div>
 

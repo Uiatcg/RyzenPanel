@@ -57,8 +57,8 @@ export default function WingsPage() {
               <Radio size={26} className="text-ryzen-400" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Wings</h1>
-              <p className="text-sm text-slate-400">Manage your Wings daemon nodes</p>
+              <h1 className="text-2xl font-bold text-white">RyzenDaemon</h1>
+              <p className="text-sm text-slate-400">Manage your daemon nodes</p>
             </div>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
@@ -90,10 +90,10 @@ export default function WingsPage() {
             <Radio size={40} className="text-ryzen-400" />
             <span className="absolute -top-1 -right-1 text-lg animate-float">💎</span>
           </div>
-          <h2 className="text-xl font-bold text-white mb-2">No Wings Connected</h2>
+          <h2 className="text-xl font-bold text-white mb-2">No Daemon Connected</h2>
           <p className="text-sm text-slate-400 max-w-md text-center">
-            Wings nodes are the machines that run your game servers. 
-            Add a node in the admin panel to connect a Wings daemon.
+            Daemon nodes are the machines that run your game servers. 
+            Add a node in the admin panel to connect a RyzenDaemon.
           </p>
           <a href="/admin/nodes" className="btn-primary mt-6">
             <HardDrive size={16} /> Go to Admin Nodes

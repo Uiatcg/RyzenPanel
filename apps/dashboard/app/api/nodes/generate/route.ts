@@ -46,7 +46,7 @@ export async function POST(req: Request) {
         daemonKey: node.daemonKey,
         nodeSecret: node.nodeSecret,
       },
-      installCommand: `bash <(curl -s https://raw.githubusercontent.com/Uiatcg/RyzenPanel/main/install.sh) --wings --panel-url="${process.env.NEXT_PUBLIC_BASE_URL || "https://YOUR_PANEL_DOMAIN"}" --node-uuid="${node.uuid}" --node-secret="${node.nodeSecret}" --daemon-key="${node.daemonKey}" --fqdn="${fqdn}"`,
+      installCommand: `bash <(curl -s https://raw.githubusercontent.com/Uiatcg/RyzenPanel/main/install.sh) --daemon --panel-url="${process.env.NEXT_PUBLIC_BASE_URL || "https://YOUR_PANEL_DOMAIN"}" --node-uuid="${node.uuid}" --node-secret="${node.nodeSecret}" --daemon-key="${node.daemonKey}" --fqdn="${fqdn}"`,
     });
   } catch (error) {
     return NextResponse.json({ message: "Failed to generate node" }, { status: 500 });

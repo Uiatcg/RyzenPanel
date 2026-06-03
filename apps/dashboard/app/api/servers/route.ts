@@ -25,20 +25,20 @@ function getEnvForServer(server: any, software: string, version: string): string
   if (["velocity", "waterfall", "bungeecord"].includes(software)) {
     return [`TYPE=${type}`];
   }
-  return [
-    `TYPE=${type}`,
-    `VERSION=${version || "latest"}`,
-    `EULA=TRUE`,
-    `MEMORY=${Math.max(512, server.ram)}M`,
-    `ONLINE_MODE=FALSE`,
-    `SERVER_NAME=${server.name}`,
-    `ENABLE_WHITELIST=FALSE`,
-    `ENABLE_RCON=FALSE`,
-    `MAX_PLAYERS=20`,
-    `DIFFICULTY=easy`,
-    `MODE=survival`,
-    `JAVA_VERSION=21`,
-  ];
+    return [
+      `TYPE=${type}`,
+      `VERSION=${version || "latest"}`,
+      `EULA=TRUE`,
+      `MEMORY=${Math.max(512, server.ram)}M`,
+      `ONLINE_MODE=FALSE`,
+      `SERVER_NAME=${server.name}`,
+      `ENABLE_WHITELIST=FALSE`,
+      `ENABLE_RCON=FALSE`,
+      `MAX_PLAYERS=20`,
+      `DIFFICULTY=easy`,
+      `MODE=survival`,
+      `JAVA_VERSION=17-jdk`,
+    ];
 }
 
 async function createContainerOnDaemon(node: any, server: any, software: string, version: string) {
@@ -92,7 +92,7 @@ export async function GET(request: Request) {
   const servers = await prisma.server.findMany({
     where,
     include: {
-      node: { select: { name: true, fqdn: true } },
+      node: { select: { id: true, name: true, fqdn: true } },
       allocations: true,
       owner: { select: { username: true } },
       _count: { select: { backups: true, databases: true, schedules: true } },
@@ -138,7 +138,7 @@ export async function POST(req: Request) {
     } else {
       const nodes = await prisma.node.findMany({ where: { status: "online" }, take: 1 });
       if (nodes.length === 0) {
-        return NextResponse.json({ message: "No active nodes available. Please add a Wings node first or contact support." }, { status: 503 });
+        return NextResponse.json({ message: "No active nodes available. Please add a daemon node first or contact support." }, { status: 503 });
       }
       node = nodes[0];
     }

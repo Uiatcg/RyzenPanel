@@ -119,7 +119,7 @@ export default function AdminNodesPage() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">Nodes</h2>
-              <p className="text-xs text-slate-400 mt-0.5">Manage Wings daemon server nodes</p>
+              <p className="text-xs text-slate-400 mt-0.5">Manage RyzenDaemon server nodes</p>
             </div>
           </div>
           <button onClick={openCreate} className="btn-primary">

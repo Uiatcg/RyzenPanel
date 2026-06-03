@@ -7,12 +7,25 @@ interface ConsolePayload {
   data: string;
 }
 
+function keepAlive(socket: WebSocket, interval = 30000) {
+  const timer = setInterval(() => {
+    if (socket.readyState === socket.OPEN) {
+      socket.ping();
+    } else {
+      clearInterval(timer);
+    }
+  }, interval);
+  socket.on("close", () => clearInterval(timer));
+}
+
 export function handleConsoleWebSocket(wss: WebSocketServer) {
   wss.on("connection", async (socket: WebSocket, request) => {
     try {
-      const url = new URL(request.url ?? "http://localhost");
+      const url = new URL(request.url ?? "/", "http://localhost");
       const containerId = url.searchParams.get("containerId");
       const token = url.searchParams.get("token");
+
+      keepAlive(socket);
 
       const daemonKey = getDaemonApiKey();
       if (daemonKey && token !== daemonKey) {

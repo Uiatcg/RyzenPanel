@@ -20,8 +20,9 @@ export function MinecraftBackground() {
     let stars: Array<{ x: number; y: number; size: number; twinkleSpeed: number; twinklePhase: number }> = [];
 
     function resize() {
-      canvas!.width = window.innerWidth;
-      canvas!.height = window.innerHeight;
+      if (!canvas) return;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     }
     resize();
     window.addEventListener("resize", resize);
@@ -82,63 +83,64 @@ export function MinecraftBackground() {
     let particleSpawnTimer = 0;
 
     function draw() {
-      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Draw sky gradient
-      const skyGrad = ctx!.createLinearGradient(0, 0, 0, canvas!.height);
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
       skyGrad.addColorStop(0, "#070714");
       skyGrad.addColorStop(0.2, "#0a0a20");
       skyGrad.addColorStop(0.4, "#0f0f30");
       skyGrad.addColorStop(0.6, "#151525");
       skyGrad.addColorStop(0.8, "#0a0a18");
       skyGrad.addColorStop(1, "#050510");
-      ctx!.fillStyle = skyGrad;
-      ctx!.fillRect(0, 0, canvas!.width, canvas!.height);
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Draw stars
       stars.forEach(star => {
         const alpha = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(Date.now() * star.twinkleSpeed + star.twinklePhase));
-        ctx!.beginPath();
-        ctx!.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-        ctx!.fillStyle = `rgba(255,255,240,${alpha})`;
-        ctx!.fill();
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,240,${alpha})`;
+        ctx.fill();
       });
 
       // Draw moon
-      const moonX = canvas!.width * 0.85;
-      const moonY = canvas!.height * 0.08;
-      const moonR = Math.min(canvas!.width, canvas!.height) * 0.035;
+      const moonX = canvas.width * 0.85;
+      const moonY = canvas.height * 0.08;
+      const moonR = Math.min(canvas.width, canvas.height) * 0.035;
 
       // Moon glow
-      const moonGlow = ctx!.createRadialGradient(moonX, moonY, 0, moonX, moonY, moonR * 4);
+      const moonGlow = ctx.createRadialGradient(moonX, moonY, 0, moonX, moonY, moonR * 4);
       moonGlow.addColorStop(0, "rgba(218,165,32,0.08)");
       moonGlow.addColorStop(1, "transparent");
-      ctx!.fillStyle = moonGlow;
-      ctx!.fillRect(0, 0, canvas!.width, canvas!.height);
+      ctx.fillStyle = moonGlow;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Moon body
-      const moonGrad = ctx!.createRadialGradient(
+      const moonGrad = ctx.createRadialGradient(
         moonX - moonR * 0.3, moonY - moonR * 0.3, 0,
         moonX, moonY, moonR
       );
       moonGrad.addColorStop(0, "#f5e68c");
       moonGrad.addColorStop(0.6, "#daa520");
       moonGrad.addColorStop(1, "#8b6914");
-      ctx!.beginPath();
-      ctx!.arc(moonX, moonY, moonR, 0, Math.PI * 2);
-      ctx!.fillStyle = moonGrad;
-      ctx!.fill();
+      ctx.beginPath();
+      ctx.arc(moonX, moonY, moonR, 0, Math.PI * 2);
+      ctx.fillStyle = moonGrad;
+      ctx.fill();
 
       // Moon craters
-      ctx!.beginPath();
-      ctx!.arc(moonX - moonR * 0.2, moonY - moonR * 0.15, moonR * 0.15, 0, Math.PI * 2);
-      ctx!.fillStyle = "rgba(139,105,20,0.2)";
-      ctx!.fill();
+      ctx.beginPath();
+      ctx.arc(moonX - moonR * 0.2, moonY - moonR * 0.15, moonR * 0.15, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(139,105,20,0.2)";
+      ctx.fill();
 
-      ctx!.beginPath();
-      ctx!.arc(moonX + moonR * 0.15, moonY + moonR * 0.2, moonR * 0.1, 0, Math.PI * 2);
-      ctx!.fillStyle = "rgba(139,105,20,0.15)";
-      ctx!.fill();
+      ctx.beginPath();
+      ctx.arc(moonX + moonR * 0.15, moonY + moonR * 0.2, moonR * 0.1, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(139,105,20,0.15)";
+      ctx.fill();
 
       // Draw mountains
       const mountainData = [
@@ -164,35 +166,35 @@ export function MinecraftBackground() {
         ]},
       ];
 
-      const h = canvas!.height;
-      const w = canvas!.width;
+      const h = canvas.height;
+      const w = canvas.width;
 
       mountainData.forEach((mountain) => {
-        ctx!.beginPath();
-        ctx!.moveTo(0, h);
+        ctx.beginPath();
+        ctx.moveTo(0, h);
         mountain.points.forEach(([px, py]) => {
-          ctx!.lineTo(px * w, py * h);
+          ctx.lineTo(px * w, py * h);
         });
-        ctx!.closePath();
-        ctx!.fillStyle = mountain.color;
-        ctx!.fill();
+        ctx.closePath();
+        ctx.fillStyle = mountain.color;
+        ctx.fill();
       });
 
       // Draw ground
       const groundY = h * 0.88;
-      const groundGrad = ctx!.createLinearGradient(0, groundY, 0, h);
+      const groundGrad = ctx.createLinearGradient(0, groundY, 0, h);
       groundGrad.addColorStop(0, "rgba(59,38,18,0.5)");
       groundGrad.addColorStop(0.3, "rgba(40,25,12,0.7)");
       groundGrad.addColorStop(1, "rgba(20,12,6,0.9)");
-      ctx!.fillStyle = groundGrad;
-      ctx!.fillRect(0, groundY, w, h - groundY);
+      ctx.fillStyle = groundGrad;
+      ctx.fillRect(0, groundY, w, h - groundY);
 
       // Grass line
       const grassY = groundY;
       for (let i = 0; i < w; i += 4) {
         const gH = 3 + Math.sin(i * 0.1 + Date.now() * 0.0003) * 1.5;
-        ctx!.fillStyle = `rgba(91,135,49,${0.15 + Math.sin(i * 0.2 + Date.now() * 0.0005) * 0.05})`;
-        ctx!.fillRect(i, grassY - gH, 2, gH);
+        ctx.fillStyle = `rgba(91,135,49,${0.15 + Math.sin(i * 0.2 + Date.now() * 0.0005) * 0.05})`;
+        ctx.fillRect(i, grassY - gH, 2, gH);
       }
 
       // Draw particles
@@ -204,31 +206,31 @@ export function MinecraftBackground() {
         const alpha = lifeRatio < 0.1 ? lifeRatio * 10 : lifeRatio > 0.8 ? (1 - lifeRatio) * 5 : 1;
 
         if (p.type === "ember") {
-          ctx!.beginPath();
-          ctx!.arc(p.x, p.y, p.size * (0.5 + 0.5 * (1 - lifeRatio * 0.5)), 0, Math.PI * 2);
-          ctx!.fillStyle = `hsla(${p.hue}, 100%, 50%, ${alpha * 0.6})`;
-          ctx!.fill();
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * (0.5 + 0.5 * (1 - lifeRatio * 0.5)), 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${p.hue}, 100%, 50%, ${alpha * 0.6})`;
+          ctx.fill();
           // Glow
-          ctx!.beginPath();
-          ctx!.arc(p.x, p.y, p.size * 2, 0, Math.PI * 2);
-          ctx!.fillStyle = `hsla(${p.hue}, 100%, 50%, ${alpha * 0.1})`;
-          ctx!.fill();
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * 2, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${p.hue}, 100%, 50%, ${alpha * 0.1})`;
+          ctx.fill();
         } else if (p.type === "portal") {
           p.x += Math.sin(p.life * 0.05) * 1;
           p.y += Math.cos(p.life * 0.03) * 0.3;
-          ctx!.beginPath();
-          ctx!.arc(p.x, p.y, p.size * (0.8 + 0.4 * Math.sin(p.life * 0.1)), 0, Math.PI * 2);
-          ctx!.fillStyle = `hsla(${p.hue}, 80%, 60%, ${alpha * 0.5})`;
-          ctx!.fill();
-          ctx!.beginPath();
-          ctx!.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
-          ctx!.fillStyle = `hsla(${p.hue}, 80%, 60%, ${alpha * 0.08})`;
-          ctx!.fill();
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * (0.8 + 0.4 * Math.sin(p.life * 0.1)), 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${p.hue}, 80%, 60%, ${alpha * 0.5})`;
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${p.hue}, 80%, 60%, ${alpha * 0.08})`;
+          ctx.fill();
         } else {
-          ctx!.beginPath();
-          ctx!.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx!.fillStyle = `hsla(40, 20%, 70%, ${alpha * 0.3})`;
-          ctx!.fill();
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(40, 20%, 70%, ${alpha * 0.3})`;
+          ctx.fill();
         }
 
         if (p.life >= p.maxLife || p.y < -20) {

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Shield, Users, Server, HardDrive, Globe, Ticket,
-  CreditCard, Percent, Megaphone, Database,
+  CreditCard, Percent, Megaphone, Database, Palette,
 } from "lucide-react";
 
 const adminLinks = [
@@ -20,6 +20,7 @@ const adminLinks = [
   { href: "/admin/coupons", label: "Coupons", icon: Percent },
   { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
   { href: "/admin/backups", label: "Backups", icon: Database },
+  { href: "/admin/settings", label: "Brand Settings", icon: Palette },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

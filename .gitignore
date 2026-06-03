@@ -9,3 +9,4 @@ npm-debug.log*
 apps/dashboard/.next
 apps/dashboard/node_modules
 apps/shared/dist
+admin-settings.json
