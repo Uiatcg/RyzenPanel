@@ -42,16 +42,28 @@ function getEnvForServer(server: any, software: string, version: string): string
 }
 
 async function createContainerOnDaemon(node: any, server: any, software: string, version: string) {
-  const daemonUrl = node.fqdn?.startsWith("http") ? node.fqdn : `http://${node.ip}:${node.daemonPort}`;
+  let daemonUrl: string;
+  if (node.fqdn?.startsWith("http")) {
+    daemonUrl = node.fqdn;
+    const parsed = new URL(daemonUrl);
+    const portInUrl = parsed.port || (parsed.protocol === "https:" ? "443" : "80");
+    if (node.daemonPort && portInUrl !== String(node.daemonPort)) {
+      daemonUrl = `${parsed.protocol}//${parsed.hostname}:${node.daemonPort}`;
+    }
+  } else {
+    daemonUrl = `http://${node.ip || "localhost"}:${node.daemonPort || 8080}`;
+  }
+
   const isProxy = ["velocity", "waterfall", "bungeecord"].includes(software);
   const image = isProxy ? PROXY_IMAGES[software] || MC_IMAGE : MC_IMAGE;
   const env = getEnvForServer(server, software, version);
+  const safeName = server.name.toLowerCase().replace(/[^a-z0-9_.-]/g, "").replace(/^[^a-z0-9]+/, "") || `server_${server.id?.slice(0, 8) || Date.now()}`;
 
   const res = await fetch(`${daemonUrl}/api/containers/create`, {
     method: "POST",
     headers: { "Content-Type": "application/json", "x-daemon-key": node.daemonKey },
     body: JSON.stringify({
-      name: server.name,
+      name: safeName,
       image,
       env,
       serverId: server.id,
@@ -62,7 +74,7 @@ async function createContainerOnDaemon(node: any, server: any, software: string,
   });
 
   if (!res.ok) {
-    const errText = await res.text();
+    const errText = await res.text().catch(() => "unknown error");
     throw new Error(`Daemon returned ${res.status}: ${errText}`);
   }
 

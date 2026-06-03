@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus, HardDrive, Wifi, WifiOff, X, Copy, Check,
   Edit3, Trash2, RefreshCw, Server, Network, Terminal,
-  MoreVertical, AlertTriangle, Radio,
+  MoreVertical, AlertTriangle, Radio, MemoryStick,
 } from "lucide-react";
 
 interface NodeData {
@@ -33,6 +33,15 @@ export default function AdminNodesPage() {
   const [form, setForm] = useState(defaultForm);
   const [showInstall, setShowInstall] = useState<any>(null);
   const [copied, setCopied] = useState(false);
+  const [panelOrigin, setPanelOrigin] = useState("https://YOUR_PANEL_URL");
+
+  useEffect(() => {
+    setPanelOrigin(window.location.origin);
+  }, []);
+
+  function getStartCommand(node: any) {
+    return `cd ryzenpanel/daemon && export DAEMON_API_KEY="${node.daemonKey || node.apiKey}" DAEMON_FQDN="${node.fqdn || node.ip}" PANEL_URL="${panelOrigin}" NODE_ID="${node.uuid || node.nodeId}" NODE_TOKEN="${node.nodeSecret || node.token}" && nohup node dist/index.js > /tmp/ryzen-daemon.log 2>&1 &`;
+  }
   const [showDelete, setShowDelete] = useState<string | null>(null);
 
   const fetchNodes = useCallback(() => {
@@ -100,20 +109,20 @@ export default function AdminNodesPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-violet-950/40 border border-slate-800/50 p-6">
-        <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-violet-500/10 to-transparent rounded-bl-full" />
-        <div className="relative flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/20 to-purple-600/20 border border-violet-500/20">
-              <HardDrive size={24} className="text-violet-400" />
+    <div className="p-6 space-y-4">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900/90 via-slate-900/80 to-slate-950/90 border border-slate-700/30 p-8 ryzen-glow">
+        <div className="absolute -top-24 -right-24 w-80 h-80 bg-gradient-to-bl from-ryzen-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="relative flex items-start justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-ryzen-500/20 to-red-600/20 border-2 border-ryzen-500/30 ryzen-glow-sm animate-float">
+              <HardDrive size={26} className="text-ryzen-400" />
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">Nodes</h2>
-              <p className="text-xs text-slate-500 mt-0.5">Manage Wings daemon server nodes</p>
+              <p className="text-xs text-slate-400 mt-0.5">Manage Wings daemon server nodes</p>
             </div>
           </div>
-          <button onClick={openCreate} className="btn-primary text-xs px-3 py-2">
+          <button onClick={openCreate} className="btn-primary">
             <Plus size={14} /> Add Node
           </button>
         </div>
@@ -121,12 +130,14 @@ export default function AdminNodesPage() {
 
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[1,2,3].map(i => <div key={i} className="skeleton h-40" />)}
+          {[1,2,3].map(i => <div key={i} className="skeleton h-48" />)}
         </div>
       ) : nodes.length === 0 ? (
-        <div className="card flex flex-col items-center justify-center py-16 text-center">
-          <HardDrive size={48} className="text-slate-700 mb-4" />
-          <p className="text-lg font-medium text-slate-400">No nodes configured</p>
+        <div className="flex flex-col items-center justify-center py-20 rounded-2xl border border-slate-700/30 bg-gradient-to-b from-slate-900/60 to-slate-900/20">
+          <div className="w-20 h-20 flex items-center justify-center rounded-2xl bg-slate-800/50 border border-slate-700/30 mb-4">
+            <HardDrive size={48} className="text-slate-600" />
+          </div>
+          <p className="text-lg font-semibold text-slate-300">No nodes configured</p>
           <p className="text-sm text-slate-500 mt-1">Add your first node to start deploying servers</p>
           <button onClick={openCreate} className="btn-primary mt-6">
             <Plus size={16} /> Add Node
@@ -136,11 +147,11 @@ export default function AdminNodesPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {nodes.map((node) => (
             <motion.div key={node.id} layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              className="card relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-violet-500/5 to-transparent rounded-bl-full" />
+              className="relative overflow-hidden rounded-2xl border border-slate-700/30 bg-gradient-to-b from-slate-900/80 to-slate-900/40 p-5 hover:border-slate-600/50 hover:shadow-lg transition-all duration-300 group">
+              <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-bl from-ryzen-500/5 to-transparent rounded-full blur-2xl" />
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className={`rounded-lg p-2.5 ${node.status === "online" ? "bg-ryzen-500/10" : "bg-slate-800"}`}>
+                  <div className={`rounded-xl p-2.5 ${node.status === "online" ? "bg-ryzen-500/10 ring-1 ring-ryzen-500/20" : "bg-slate-800"}`}>
                     <HardDrive size={18} className={node.status === "online" ? "text-ryzen-400" : "text-slate-500"} />
                   </div>
                   <div>
@@ -150,14 +161,14 @@ export default function AdminNodesPage() {
                 </div>
                 <div className="flex items-center gap-1">
                   <div className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                    node.status === "online" ? "bg-ryzen-500/10 text-ryzen-400" :
+                    node.status === "online" ? "bg-emerald-500/10 text-emerald-400" :
                     node.status === "offline" ? "bg-red-500/10 text-red-400" :
                     "bg-yellow-500/10 text-yellow-400"
                   }`}>
                     {node.status === "online" ? <Wifi size={10} /> : <WifiOff size={10} />}
                     {node.status}
                   </div>
-                  <div className="relative">
+                    <div className="relative">
                     <button onClick={() => setShowDelete(showDelete === node.id ? null : node.id)}
                       className="p-1 rounded-lg hover:bg-slate-800 transition-colors">
                       <MoreVertical size={14} className="text-slate-500" />
@@ -165,14 +176,17 @@ export default function AdminNodesPage() {
                     {showDelete === node.id && (
                       <>
                         <div className="fixed inset-0 z-40" onClick={() => setShowDelete(null)} />
-                        <div className="absolute right-0 top-full mt-1 z-50 w-36 rounded-xl border border-slate-700/50 bg-slate-900/95 backdrop-blur-xl p-1 shadow-xl">
+                        <div className="absolute right-0 top-full mt-1 z-50 w-44 rounded-xl border border-slate-700/50 bg-slate-900/95 backdrop-blur-xl p-1 shadow-xl">
                           <button onClick={() => { openEdit(node); setShowDelete(null); }}
                             className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 transition-colors">
                             <Edit3 size={12} /> Edit
                           </button>
-                          <button onClick={() => { setShowInstall(node); setShowDelete(null); }}
+                          <button onClick={() => {
+                            setShowInstall(node);
+                            setShowDelete(null);
+                          }}
                             className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 transition-colors">
-                            <Terminal size={12} /> Install Command
+                            <Terminal size={12} /> Start Command
                           </button>
                           {node.status === "online" ? (
                             <button onClick={() => { handleAction(node.id, "suspend"); setShowDelete(null); }}
@@ -216,28 +230,28 @@ export default function AdminNodesPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <div>
-                  <div className="flex justify-between text-[10px] text-slate-500 mb-1">
-                    <span>RAM: {node.memoryUsed >= 1024 ? `${(node.memoryUsed / 1024).toFixed(1)} GB` : `${node.memoryUsed} MB`}</span>
-                    <span>{node.maxRam >= 1024 ? `${(node.maxRam / 1024).toFixed(0)} GB` : `${node.maxRam} MB`}</span>
+                <div className="space-y-2">
+                  <div>
+                    <div className="flex justify-between text-[10px] text-slate-500 mb-1">
+                      <span className="flex items-center gap-1"><MemoryStick size={9} className="text-ryzen-400" /> RAM</span>
+                      <span>{node.memoryUsed >= 1024 ? `${(node.memoryUsed / 1024).toFixed(1)} GB` : `${node.memoryUsed} MB`} / {node.maxRam >= 1024 ? `${(node.maxRam / 1024).toFixed(0)} GB` : `${node.maxRam} MB`}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-ryzen-500 to-red-500 transition-all duration-500"
+                        style={{ width: `${Math.min(100, (node.memoryUsed / node.maxRam) * 100)}%` }} />
+                    </div>
                   </div>
-                  <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
-                    <div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-500"
-                      style={{ width: `${Math.min(100, (node.memoryUsed / node.maxRam) * 100)}%` }} />
+                  <div>
+                    <div className="flex justify-between text-[10px] text-slate-500 mb-1">
+                      <span className="flex items-center gap-1"><HardDrive size={9} className="text-cyan-400" /> Disk</span>
+                      <span>{node.diskUsed >= 1024 ? `${(node.diskUsed / 1024).toFixed(1)} GB` : `${node.diskUsed} MB`} / {node.maxDisk >= 1024 ? `${(node.maxDisk / 1024).toFixed(0)} GB` : `${node.maxDisk} MB`}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500"
+                        style={{ width: `${Math.min(100, (node.diskUsed / node.maxDisk) * 100)}%` }} />
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <div className="flex justify-between text-[10px] text-slate-500 mb-1">
-                    <span>Disk: {node.diskUsed >= 1024 ? `${(node.diskUsed / 1024).toFixed(1)} GB` : `${node.diskUsed} MB`}</span>
-                    <span>{node.maxDisk >= 1024 ? `${(node.maxDisk / 1024).toFixed(0)} GB` : `${node.maxDisk} MB`}</span>
-                  </div>
-                  <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
-                    <div className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500"
-                      style={{ width: `${Math.min(100, (node.diskUsed / node.maxDisk) * 100)}%` }} />
-                  </div>
-                </div>
-              </div>
 
               {node.lastHeartbeat && (
                 <p className="text-[10px] text-slate-600 mt-2">
@@ -390,12 +404,12 @@ export default function AdminNodesPage() {
                 </div>
 
                 <div>
-                  <p className="text-xs font-medium text-slate-400 mb-2">Install & Connect Command</p>
+                  <p className="text-xs font-medium text-slate-400 mb-2">Start Daemon Command</p>
                   <div className="relative">
-                    <pre className="rounded-xl bg-slate-950 border border-slate-800 p-4 text-xs font-mono text-ryzen-400 overflow-x-auto">
-                      <code>{showInstall.installCommand}</code>
+                    <pre className="rounded-xl bg-slate-950 border border-slate-800 p-4 text-xs font-mono text-ryzen-400 overflow-x-auto whitespace-pre-wrap break-all">
+                      <code>{showInstall.startCommand || getStartCommand(showInstall)}</code>
                     </pre>
-                    <button onClick={() => copyToClipboard(showInstall.installCommand)}
+                    <button onClick={() => copyToClipboard(showInstall.startCommand || getStartCommand(showInstall))}
                       className="absolute top-2 right-2 rounded-lg bg-slate-800 p-2 hover:bg-slate-700 transition-colors">
                       {copied ? <Check size={14} className="text-ryzen-400" /> : <Copy size={14} className="text-slate-400" />}
                     </button>

@@ -22,8 +22,8 @@ export function BottomNav() {
           const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
           return (
             <Link key={item.href} href={item.href}
-              className={`flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition-colors ${
-                isActive ? "text-ryzen-400" : "text-slate-500"
+              className={`flex flex-col items-center gap-0.5 rounded-xl px-3 py-1.5 transition-all ${
+                isActive ? "text-ryzen-400" : "text-slate-500 hover:text-slate-300"
               }`}
             >
               <item.icon size={18} />

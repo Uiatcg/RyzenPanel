@@ -77,10 +77,9 @@ export default function ConsolePage() {
             setLogs(prev => [...prev, msg.data]);
           } else if (msg.error) {
             setLogs(prev => [...prev, `[ERROR] ${msg.error}`]);
-            // Don't reconnect on "no such container" - permanent error
             if (msg.error.includes("no such container") || msg.error.includes("No such container")) {
               setLogs(prev => [...prev, "[WARN] [RYZENPANEL] Container not found. Waiting for server to start..."]);
-              reconnectAttempts = MAX_RECONNECT; // Stop retrying
+              reconnectAttempts = MAX_RECONNECT;
               return;
             }
           }
@@ -97,19 +96,12 @@ export default function ConsolePage() {
         }
       };
 
-      ws.onerror = () => {
-        ws.close();
-      };
-
+      ws.onerror = () => { ws.close(); };
       wsRef.current = ws;
     }
 
     connect();
-
-    return () => {
-      clearTimeout(reconnectTimer);
-      wsRef.current?.close();
-    };
+    return () => { clearTimeout(reconnectTimer); wsRef.current?.close(); };
   }, [params.id, nodeIp, nodeFqdn, nodeDaemonKey, containerId]);
 
   const handleSend = useCallback(() => {
@@ -144,9 +136,7 @@ export default function ConsolePage() {
     setPowerLoading(null);
   }
 
-  function handleCopyAll() {
-    navigator.clipboard.writeText(logs.join("\n"));
-  }
+  function handleCopyAll() { navigator.clipboard.writeText(logs.join("\n")); }
 
   const filteredLogs = search ? logs.filter(l => l.toLowerCase().includes(search.toLowerCase())) : logs;
 
@@ -171,77 +161,106 @@ export default function ConsolePage() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="p-6 space-y-4">
+      {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-800">
-            <Terminal size={16} className="text-ryzen-400" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/30">
+            <Terminal size={18} className="text-ryzen-400" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-semibold text-white">Live Console</h3>
-              <span className={`text-xs font-medium ${connected ? "text-ryzen-400" : "text-red-400"}`}>
-                {connected ? <Wifi size={12} className="inline mr-1" /> : <WifiOff size={12} className="inline mr-1" />}
+              <div className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium border ${
+                connected ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-400 border-red-500/20"
+              }`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${connected ? "bg-emerald-400" : "bg-red-400"}`} />
                 {connected ? "Connected" : "Disconnected"}
-              </span>
-              <span className={`text-xs font-medium ${statusColors[serverStatus] || "text-slate-400"}`}>
-                <span className={`inline-block h-1.5 w-1.5 rounded-full mr-1 ${
-                  serverStatus === "ONLINE" ? "bg-ryzen-400" : serverStatus === "OFFLINE" ? "bg-red-400" : "bg-yellow-400"
+              </div>
+              <div className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium border ${
+                serverStatus === "ONLINE" ? "bg-ryzen-500/10 text-ryzen-400 border-ryzen-500/20" :
+                serverStatus === "OFFLINE" ? "bg-slate-800/50 text-slate-500 border-slate-700/30" :
+                "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
+              }`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${
+                  serverStatus === "ONLINE" ? "bg-ryzen-400" :
+                  serverStatus === "OFFLINE" ? "bg-slate-600" : "bg-yellow-400"
                 }`} />
                 {serverStatus}
-              </span>
+              </div>
             </div>
             <p className="text-[10px] text-slate-500">Send commands and view live output</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <button onClick={() => handlePowerAction("start")} disabled={powerLoading !== null}
-            className="flex items-center gap-1 rounded-lg bg-ryzen-500/10 px-2.5 py-1.5 text-xs font-medium text-ryzen-400 hover:bg-ryzen-500/20 transition-all disabled:opacity-50">
-            <Play size={12} /> Start
-          </button>
-          <button onClick={() => handlePowerAction("stop")} disabled={powerLoading !== null}
-            className="flex items-center gap-1 rounded-lg bg-red-500/10 px-2.5 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/20 transition-all disabled:opacity-50">
-            <Square size={12} /> Stop
-          </button>
-          <button onClick={() => handlePowerAction("restart")} disabled={powerLoading !== null}
-            className="flex items-center gap-1 rounded-lg bg-yellow-500/10 px-2.5 py-1.5 text-xs font-medium text-yellow-400 hover:bg-yellow-500/20 transition-all disabled:opacity-50">
-            <RotateCcw size={12} /> Restart
-          </button>
-          <button onClick={() => handlePowerAction("kill")} disabled={powerLoading !== null}
-            className="flex items-center gap-1 rounded-lg bg-red-500/20 px-2.5 py-1.5 text-xs font-medium text-red-400 hover:bg-red-500/30 transition-all disabled:opacity-50">
-            <Zap size={12} /> Kill
-          </button>
+          {[
+            { action: "start", icon: Play, label: "Start", color: "text-ryzen-400 hover:bg-ryzen-500/20 bg-ryzen-500/10 border-ryzen-500/20" },
+            { action: "stop", icon: Square, label: "Stop", color: "text-red-400 hover:bg-red-500/20 bg-red-500/10 border-red-500/20" },
+            { action: "restart", icon: RotateCcw, label: "Restart", color: "text-yellow-400 hover:bg-yellow-500/20 bg-yellow-500/10 border-yellow-500/20" },
+            { action: "kill", icon: Zap, label: "Kill", color: "text-red-400 hover:bg-red-500/30 bg-red-500/20 border-red-500/30" },
+          ].map(({ action, icon: Icon, label, color }) => (
+            <button key={action} onClick={() => handlePowerAction(action)} disabled={powerLoading !== null}
+              className={`flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-all disabled:opacity-50 ${color}`}
+            >
+              <Icon size={12} /> {label}
+            </button>
+          ))}
         </div>
       </div>
 
+      {/* Search */}
       <div className="relative">
         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
         <input value={search} onChange={e => setSearch(e.target.value)}
-          className="input-field pl-9 py-2 text-xs" placeholder="Search console output..." />
+          className="input-field pl-9 py-2 text-xs bg-slate-900/60 border-slate-700/30 focus:border-ryzen-500/30"
+          placeholder="🔍 Search console output..." />
       </div>
 
-      <div className="card p-0 overflow-hidden">
-        <div className="flex items-center justify-between border-b border-slate-800/50 px-4 py-2">
-          <span className="text-[10px] text-slate-500">{filteredLogs.length} lines</span>
+      {/* Terminal */}
+      <div className="rounded-2xl border border-slate-700/30 overflow-hidden bg-black/70 backdrop-blur-sm shadow-lg">
+        {/* Terminal Title Bar */}
+        <div className="flex items-center justify-between border-b border-slate-800/50 px-4 py-2 bg-slate-900/50">
           <div className="flex items-center gap-2">
-            <button onClick={() => setLogs([])} className="btn-ghost text-[10px] px-2 py-1"><Trash2 size={12} /> Clear</button>
-            <button onClick={handleCopyAll} className="btn-ghost text-[10px] px-2 py-1"><Copy size={12} /> Copy All</button>
-            <label className="flex items-center gap-1 text-[10px] text-slate-500 cursor-pointer">
+            <div className="flex gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
+              <span className="h-2.5 w-2.5 rounded-full bg-yellow-500" />
+              <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
+            </div>
+            <span className="text-[10px] text-slate-600 ml-2 font-mono">
+              ⚡ ryzenpanel@console — {filteredLogs.length} lines
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setLogs([])}
+              className="text-[10px] text-slate-500 hover:text-slate-300 px-2 py-1 rounded-lg hover:bg-slate-800/50 transition-all">
+              <Trash2 size={12} className="inline mr-1" />Clear
+            </button>
+            <button onClick={handleCopyAll}
+              className="text-[10px] text-slate-500 hover:text-slate-300 px-2 py-1 rounded-lg hover:bg-slate-800/50 transition-all">
+              <Copy size={12} className="inline mr-1" />Copy
+            </button>
+            <label className="flex items-center gap-1 text-[10px] text-slate-500 cursor-pointer select-none">
               <input type="checkbox" checked={autoScroll} onChange={e => setAutoScroll(e.target.checked)}
                 className="rounded border-slate-700 bg-slate-800 text-ryzen-500 focus:ring-ryzen-500/20 w-3 h-3" />
               Auto-scroll
             </label>
           </div>
         </div>
-        <div className="font-mono text-xs leading-relaxed" style={{ maxHeight: "50vh", overflowY: "auto", padding: "12px" }}>
+
+        {/* Terminal Output */}
+        <div className="font-mono text-xs leading-relaxed bg-[#0a0a12]/90" style={{ maxHeight: "55vh", overflowY: "auto", padding: "14px" }}>
           {filteredLogs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Terminal size={32} className="text-slate-700 mb-3" />
-              <p className="text-xs text-slate-500">No console output yet</p>
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <Terminal size={36} className="text-slate-700 mb-3" />
+              <p className="text-sm text-slate-500">No console output yet</p>
+              <p className="text-[10px] text-slate-600 mt-1">Start the server to see logs</p>
             </div>
           ) : (
             filteredLogs.map((line, i) => (
-              <div key={i} className="py-0.5 hover:bg-slate-800/20 px-2 -mx-2 rounded">
+              <div key={i} className="py-[2px] hover:bg-white/[0.02] px-2 -mx-2 rounded text-[#c0c0c0] whitespace-pre-wrap break-all">
+                <span className="text-[#444] select-none mr-2 font-mono" style={{ minWidth: "32px", display: "inline-block", textAlign: "right" }}>
+                  {String(i + 1).padStart(3, "0")}
+                </span>
                 <span dangerouslySetInnerHTML={{ __html: formatLogLine(line) }} />
               </div>
             ))
@@ -250,13 +269,20 @@ export default function ConsolePage() {
         </div>
       </div>
 
+      {/* Command Input */}
       <div className="flex gap-2">
-        <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
-          onKeyDown={e => { if (e.key === "Enter") handleSend(); }}
-          className="input-field flex-1 font-mono text-sm" placeholder="Type a command..."
-          disabled={!connected}
-        />
-        <button onClick={handleSend} disabled={!connected || !input.trim()} className="btn-primary px-4">
+        <div className="flex-1 relative">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-ryzen-400 font-mono font-bold">$</span>
+          <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") handleSend(); }}
+            className="input-field flex-1 font-mono text-sm pl-8 bg-black/40 border-slate-700/30 focus:border-ryzen-500/30"
+            placeholder={connected ? "Type a command..." : "⏳ Waiting for connection..."}
+            disabled={!connected}
+          />
+        </div>
+        <button onClick={handleSend} disabled={!connected || !input.trim()}
+          className="flex items-center gap-2 rounded-xl bg-ryzen-500/10 border border-ryzen-500/20 px-5 text-sm font-medium text-ryzen-400 hover:bg-ryzen-500/20 transition-all disabled:opacity-30"
+        >
           <Send size={16} />
         </button>
       </div>

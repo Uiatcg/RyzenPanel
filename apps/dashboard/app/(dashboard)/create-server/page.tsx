@@ -6,20 +6,42 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronRight, ChevronLeft, Check, Server, Package, Cpu,
   FileText, Rocket, HardDrive, MemoryStick, Globe, Type,
+  Diamond, Sword, Shield, Pickaxe, Zap,
 } from "lucide-react";
 
 const softwareOptions = [
-  { id: "paper", name: "Paper", desc: "High performance Spigot fork" },
-  { id: "purpur", name: "Purpur", desc: "Optimized with extra features" },
-  { id: "spigot", name: "Spigot", desc: "Most widely used server software" },
-  { id: "vanilla", name: "Vanilla", desc: "Official Minecraft server" },
-  { id: "fabric", name: "Fabric", desc: "Lightweight mod loader" },
-  { id: "forge", name: "Forge", desc: "Popular modding platform" },
-  { id: "neoforge", name: "NeoForge", desc: "Next-gen Forge fork" },
-  { id: "velocity", name: "Velocity", desc: "Modern proxy server" },
-  { id: "waterfall", name: "Waterfall", desc: "BungeeCord fork" },
-  { id: "bungeecord", name: "BungeeCord", desc: "Network proxy" },
+  { id: "paper", name: "Paper", desc: "High performance Spigot fork", icon: "📄", block: "mc-block-paper", rarity: "rare" },
+  { id: "purpur", name: "Purpur", desc: "Optimized with extra features", icon: "💜", block: "mc-block-end", rarity: "epic" },
+  { id: "spigot", name: "Spigot", desc: "Most widely used server software", icon: "🍖", block: "mc-block-wood", rarity: "common" },
+  { id: "vanilla", name: "Vanilla", desc: "Official Minecraft server", icon: "🌿", block: "mc-block-grass", rarity: "common" },
+  { id: "fabric", name: "Fabric", desc: "Lightweight mod loader", icon: "🧵", block: "mc-block-iron", rarity: "uncommon" },
+  { id: "forge", name: "Forge", desc: "Popular modding platform", icon: "⚒️", block: "mc-block-gold", rarity: "rare" },
+  { id: "neoforge", name: "NeoForge", desc: "Next-gen Forge fork", icon: "🔥", block: "mc-block-lava", rarity: "epic" },
+  { id: "velocity", name: "Velocity", desc: "Modern proxy server", icon: "💨", block: "mc-block-water", rarity: "uncommon" },
+  { id: "waterfall", name: "Waterfall", desc: "BungeeCord fork", icon: "🌊", block: "mc-block-water", rarity: "common" },
+  { id: "bungeecord", name: "BungeeCord", desc: "Network proxy", icon: "🔗", block: "mc-block-iron", rarity: "common" },
 ];
+
+const versionImages: Record<string, string> = {
+  "1.21": "⚡",
+  "1.20.4": "🏰",
+  "1.19.4": "🗡️",
+  "1.18.2": "⛏️",
+  "1.17.1": "🪨",
+  "1.16.5": "💀",
+  "3.3": "🚀",
+  "3.2": "🚀",
+  "3.1": "🚀",
+};
+
+const versionColors: Record<string, string> = {
+  "1.21": "from-violet-600 to-blue-600",
+  "1.20.4": "from-blue-600 to-cyan-600",
+  "1.19.4": "from-cyan-600 to-emerald-600",
+  "1.18.2": "from-emerald-600 to-green-600",
+  "1.17.1": "from-yellow-600 to-amber-600",
+  "1.16.5": "from-orange-600 to-red-600",
+};
 
 const versions: Record<string, string[]> = {
   paper: ["1.21", "1.20.4", "1.19.4", "1.18.2", "1.17.1", "1.16.5"],
@@ -32,6 +54,14 @@ const versions: Record<string, string[]> = {
   velocity: ["3.3", "3.2", "3.1"],
   waterfall: ["1.21", "1.20", "1.19"],
   bungeecord: ["1.21", "1.20", "1.19"],
+};
+
+const rarityConfig: Record<string, { color: string; border: string; bg: string }> = {
+  common: { color: "text-slate-400", border: "border-slate-400/20", bg: "bg-slate-400/5" },
+  uncommon: { color: "text-cyan-400", border: "border-cyan-400/20", bg: "bg-cyan-400/5" },
+  rare: { color: "text-blue-400", border: "border-blue-400/20", bg: "bg-blue-400/5" },
+  epic: { color: "text-purple-400", border: "border-purple-400/20", bg: "bg-purple-400/5" },
+  legendary: { color: "text-amber-400", border: "border-amber-400/20", bg: "bg-amber-400/5" },
 };
 
 const steps = [
@@ -98,129 +128,174 @@ export default function CreateServerWizard() {
   }
 
   const dockerImages: Record<string, string> = {
-    paper: "itzg/minecraft-server",
-    purpur: "itzg/minecraft-server",
-    spigot: "itzg/minecraft-server",
-    vanilla: "itzg/minecraft-server",
-    fabric: "itzg/minecraft-server",
-    forge: "itzg/minecraft-server",
-    neoforge: "itzg/minecraft-server",
-    velocity: "itzg/velocity",
-    waterfall: "itzg/waterfall",
-    bungeecord: "itzg/bungeecord",
+    paper: "itzg/minecraft-server", purpur: "itzg/minecraft-server",
+    spigot: "itzg/minecraft-server", vanilla: "itzg/minecraft-server",
+    fabric: "itzg/minecraft-server", forge: "itzg/minecraft-server",
+    neoforge: "itzg/minecraft-server", velocity: "itzg/velocity",
+    waterfall: "itzg/waterfall", bungeecord: "itzg/bungeecord",
   };
 
   const selectedSoftware = softwareOptions.find(o => o.id === software);
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/40 border border-slate-800/50 p-8 mb-8">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-ryzen-500/10 to-transparent rounded-bl-full" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-emerald-500/5 to-transparent rounded-tr-full" />
-        <div className="relative flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-ryzen-500/20 to-emerald-600/20 border border-ryzen-500/20">
-            <Rocket size={28} className="text-ryzen-400" />
+      {/* Banner */}
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900/90 via-slate-900/80 to-slate-950/90 border border-slate-700/30 p-8 mb-8 ryzen-glow"
+      >
+        <div className="absolute -top-16 -right-16 w-48 h-48 opacity-[0.04]">
+          <div className="mc-block mc-block-diamond w-full h-full text-6xl flex items-center justify-center rotate-12">◆</div>
+        </div>
+        <div className="relative flex items-center gap-5">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-ryzen-500/20 to-red-600/20 border-2 border-ryzen-500/30 ryzen-glow-sm animate-float">
+            <Rocket size={30} className="text-ryzen-400" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white">Create Server</h1>
             <p className="text-sm text-slate-400 mt-1">Deploy a new Minecraft server in minutes</p>
           </div>
         </div>
-      </div>
+      </motion.div>
 
+      {/* Step Indicator */}
       <div className="mb-8 overflow-x-auto">
-        <div className="flex items-center justify-between min-w-[600px]">
+        <div className="flex items-center min-w-[640px]">
           {steps.map((s, i) => (
-            <div key={s.id} className="flex items-center">
-              <div className={`flex items-center gap-2 ${i <= step ? "text-ryzen-400" : "text-slate-600"}`}>
-                <div className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold transition-all shrink-0 ${
-                  i < step ? "bg-ryzen-500 text-white" : i === step ? "bg-ryzen-500/20 text-ryzen-400 border border-ryzen-500/30" : "bg-slate-800 text-slate-600"
+            <div key={s.id} className="flex items-center flex-1">
+              <div className={`flex flex-col items-center gap-1.5 ${i <= step ? "text-ryzen-400" : "text-slate-600"}`}>
+                <div className={`flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold transition-all duration-300 shrink-0 ${
+                  i < step ? "bg-ryzen-500 text-white scale-100" :
+                  i === step ? "bg-ryzen-500/20 text-ryzen-400 border border-ryzen-500/30 scale-110 ryzen-glow-sm" :
+                  "bg-slate-800/50 text-slate-600 border border-slate-700/30"
                 }`}>
                   {i < step ? <Check size={14} /> : <s.icon size={14} />}
                 </div>
-                <span className="text-xs font-medium hidden sm:inline">{s.title}</span>
+                <span className={`text-[10px] font-medium whitespace-nowrap ${i === step ? "text-ryzen-400" : ""}`}>{s.title}</span>
               </div>
-              {i < steps.length - 1 && <div className={`mx-2 h-px w-6 sm:w-12 ${i < step ? "bg-ryzen-500/50" : "bg-slate-800"}`} />}
+              {i < steps.length - 1 && (
+                <div className={`flex-1 h-px mx-2 mb-5 ${i < step ? "bg-gradient-to-r from-ryzen-500/50 to-ryzen-500/20" : "bg-slate-800"}`} />
+              )}
             </div>
           ))}
         </div>
       </div>
 
-      <div className="card min-h-[400px]">
+      {/* Wizard Body */}
+      <div className="rounded-2xl border border-slate-700/30 bg-gradient-to-b from-slate-900/80 to-slate-900/40 p-6 min-h-[440px]">
         <AnimatePresence mode="wait">
           {step === 0 && (
-            <motion.div key="step0" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+            <motion.div key="s0" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold text-white">Server Name</h2>
+                <h2 className="text-lg font-semibold text-white">⛏️ Server Name</h2>
                 <p className="text-sm text-slate-400 mt-1">Choose a name for your Minecraft server</p>
               </div>
               <div>
-                <label className="text-xs font-medium text-slate-400">Server Name</label>
+                <label className="text-xs font-medium text-slate-400 flex items-center gap-1"><span>📝</span> Server Name</label>
                 <div className="relative mt-1.5">
-                  <Type size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                  <Type size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                   <input value={name} onChange={e => setName(e.target.value)}
-                    className="input-field pl-10 text-base" placeholder="My Awesome Server" required minLength={3} autoFocus />
+                    className="input-field pl-10 text-base bg-slate-800/50 border-slate-700/30 focus:border-ryzen-500/30"
+                    placeholder="My Awesome Server" required minLength={3} autoFocus />
                 </div>
                 <p className="text-xs text-slate-500 mt-2">Must be at least 3 characters</p>
               </div>
-              <div className="rounded-xl bg-ryzen-500/5 border border-ryzen-500/10 p-4">
+              <div className="rounded-xl bg-gradient-to-r from-ryzen-500/5 to-ryzen-500/[0.02] border border-ryzen-500/10 p-4">
                 <p className="text-xs text-slate-400">
-                  <span className="text-ryzen-400 font-medium">Tip:</span> Choose a name that represents your server well. You can change it later.
+                  <span className="text-ryzen-400 font-medium">💡 Tip:</span> Choose a descriptive name. You can change it later.
                 </p>
               </div>
             </motion.div>
           )}
 
           {step === 1 && (
-            <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-              <h2 className="text-lg font-semibold text-white">Server Type</h2>
-              <p className="text-sm text-slate-400">Select the server software you want to run</p>
+            <motion.div key="s1" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-4">
+              <div>
+                <h2 className="text-lg font-semibold text-white">🎮 Server Type</h2>
+                <p className="text-sm text-slate-400">Select the server software</p>
+              </div>
               <div className="grid gap-3 sm:grid-cols-2">
-                {softwareOptions.map(opt => (
-                  <button key={opt.id} onClick={() => { setSoftware(opt.id); setVersion(""); }}
-                    className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${
-                      software === opt.id
-                        ? "border-ryzen-500/50 bg-ryzen-500/10 shadow-sm shadow-ryzen-500/10"
-                        : "border-slate-800 hover:border-slate-700 bg-slate-900/50"
-                    }`}
-                  >
-                    <div className={`mt-0.5 flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold shrink-0 ${
-                      software === opt.id ? "bg-ryzen-500/20 text-ryzen-400" : "bg-slate-800 text-slate-500"
-                    }`}>
-                      {opt.name.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-white">{opt.name}</p>
-                      <p className="text-xs text-slate-500 mt-0.5">{opt.desc}</p>
-                    </div>
-                  </button>
-                ))}
+                {softwareOptions.map(opt => {
+                  const rarity = rarityConfig[opt.rarity] || rarityConfig.common;
+                  const isSelected = software === opt.id;
+                  return (
+                    <button key={opt.id} onClick={() => { setSoftware(opt.id); setVersion(""); }}
+                      className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all duration-200 ${
+                        isSelected
+                          ? `${rarity.border} ${rarity.bg} shadow-sm`
+                          : "border-slate-700/30 hover:border-slate-600/50 bg-slate-900/50 hover:bg-slate-800/50"
+                      }`}
+                    >
+                      <div className={`mc-block ${opt.block} w-10 h-10 text-lg shrink-0`}>
+                        <span className="relative z-10">{opt.icon}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium text-white">{opt.name}</p>
+                          <span className={`text-[9px] font-bold uppercase ${rarity.color}`}>{opt.rarity}</span>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-0.5">{opt.desc}</p>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </motion.div>
           )}
 
           {step === 2 && (
-            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-              <h2 className="text-lg font-semibold text-white">Minecraft Version</h2>
-              <p className="text-sm text-slate-400">Select the version for your {selectedSoftware?.name || "Minecraft"} server</p>
-              <div className="grid gap-3 sm:grid-cols-3">
-                {(versions[software] || ["1.21", "1.20.4", "1.19.4"]).map(v => (
-                  <button key={v} onClick={() => setVersion(v)}
-                    className={`rounded-xl border p-4 text-center transition-all ${
-                      version === v
-                        ? "border-ryzen-500/50 bg-ryzen-500/10 shadow-sm shadow-ryzen-500/10"
-                        : "border-slate-800 hover:border-slate-700 bg-slate-900/50"
-                    }`}
-                  >
-                    <p className="text-lg font-bold text-white">MC {v}</p>
-                    <p className="text-xs text-slate-500 mt-1">{selectedSoftware?.name}</p>
-                  </button>
-                ))}
+            <motion.div key="s2" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-4">
+              <div>
+                <h2 className="text-lg font-semibold text-white">📦 Minecraft Version</h2>
+                <p className="text-sm text-slate-400">Select version for <strong className="text-ryzen-400">{selectedSoftware?.name}</strong></p>
               </div>
-              {software && (
-                <div className="rounded-xl bg-slate-800/30 px-4 py-3">
-                  <p className="text-xs text-slate-400">
-                    Docker image: <code className="text-ryzen-400">{dockerImages[software]}</code>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {(versions[software] || ["1.21", "1.20.4", "1.19.4"]).map(v => {
+                  const color = versionColors[v] || "from-slate-600 to-slate-700";
+                  const isSelected = version === v;
+                  return (
+                    <button key={v} onClick={() => setVersion(v)}
+                      className={`relative rounded-xl border p-4 text-center transition-all duration-200 overflow-hidden group ${
+                        isSelected
+                          ? "border-ryzen-500/50 bg-gradient-to-b from-ryzen-500/10 to-transparent shadow-sm shadow-ryzen-500/10 ryzen-glow-sm"
+                          : "border-slate-700/30 hover:border-slate-600/50 bg-slate-900/50 hover:bg-slate-800/50"
+                      }`}
+                    >
+                      {/* Version color stripe */}
+                      <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${color}`} />
+
+                      {/* Minecraft icon for version */}
+                      <div className="text-3xl mb-2">{versionImages[v] || "📦"}</div>
+
+                      <p className={`text-base font-bold ${isSelected ? "text-ryzen-400" : "text-white"}`}>
+                        {v.startsWith("3.") ? v : `1.${v.split(".").slice(1).join(".")}`}
+                      </p>
+                      <p className="text-[10px] text-slate-500 mt-1">{selectedSoftware?.name}</p>
+
+                      {/* Version flavor text */}
+                      <div className="mt-2 flex items-center justify-center gap-1">
+                        {v === "1.21" && <span className="text-[9px] text-violet-400">✨ Latest</span>}
+                        {v === "1.16.5" && <span className="text-[9px] text-orange-400">🔥 Classic</span>}
+                        {v === "1.20.4" && <span className="text-[9px] text-blue-400">🌳 Stable</span>}
+                        {v === "1.19.4" && <span className="text-[9px] text-cyan-400">🌌 Wild</span>}
+                        {v === "1.18.2" && <span className="text-[9px] text-emerald-400">⛰️ Caves</span>}
+                        {v === "1.17.1" && <span className="text-[9px] text-amber-400">🪨 Mountains</span>}
+                      </div>
+
+                      {isSelected && (
+                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-ryzen-500 rounded-bl-lg flex items-center justify-center">
+                          <Check size={10} className="text-white" />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {selectedSoftware && (
+                <div className="rounded-xl bg-slate-800/30 border border-slate-700/20 px-4 py-3">
+                  <p className="text-xs text-slate-400 flex items-center gap-2">
+                    <span>🐳 Docker image:</span>
+                    <code className="text-ryzen-400 bg-ryzen-500/5 px-2 py-0.5 rounded-md font-mono">{dockerImages[software]}</code>
                   </p>
                 </div>
               )}
@@ -228,40 +303,45 @@ export default function CreateServerWizard() {
           )}
 
           {step === 3 && (
-            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-              <h2 className="text-lg font-semibold text-white">Select Node</h2>
-              <p className="text-sm text-slate-400">Choose which Wings node to deploy this server on</p>
+            <motion.div key="s3" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-4">
+              <div>
+                <h2 className="text-lg font-semibold text-white">🌍 Select Node</h2>
+                <p className="text-sm text-slate-400">Choose which Wings node to deploy on</p>
+              </div>
               {nodes.length === 0 ? (
-                <div className="rounded-xl bg-ryzen-500/5 border border-ryzen-500/10 p-6 text-center">
-                  <Globe size={24} className="mx-auto text-slate-500 mb-2" />
-                  <p className="text-sm text-slate-400">No nodes available. Add a node in the admin panel first.</p>
+                <div className="rounded-xl bg-slate-800/30 border border-slate-700/20 p-8 text-center">
+                  <Globe size={28} className="mx-auto text-slate-600 mb-3" />
+                  <p className="text-sm text-slate-400">No nodes available. Add a node in admin panel first.</p>
                 </div>
               ) : (
                 <div className="grid gap-3">
                   {nodes.map(n => {
-                    const selected = nodeId === n.id;
                     const isOnline = n.status === "online";
+                    const isSelected = nodeId === n.id;
                     return (
                       <button key={n.id} onClick={() => setNodeId(n.id)} disabled={!isOnline}
-                        className={`flex items-center gap-4 rounded-xl border p-4 text-left transition-all ${
-                          selected ? "border-ryzen-500/50 bg-ryzen-500/10 shadow-sm shadow-ryzen-500/10" : "border-slate-800 hover:border-slate-700 bg-slate-900/50"
-                        } ${!isOnline ? "opacity-50 cursor-not-allowed" : ""}`}
+                        className={`flex items-center gap-4 rounded-xl border p-4 text-left transition-all duration-200 ${
+                          isSelected
+                            ? "border-ryzen-500/50 bg-gradient-to-r from-ryzen-500/10 to-transparent shadow-sm shadow-ryzen-500/10"
+                            : "border-slate-700/30 hover:border-slate-600/50 bg-slate-900/50"
+                        } ${!isOnline ? "opacity-40 cursor-not-allowed" : ""}`}
                       >
-                        <div className={`flex h-10 w-10 items-center justify-center rounded-xl shrink-0 ${
-                          isOnline ? "bg-green-500/10" : "bg-slate-800"
-                        }`}>
-                          <Globe size={20} className={isOnline ? "text-green-400" : "text-slate-500"} />
+                        <div className={`mc-block ${isOnline ? "mc-block-grass" : "mc-block-stone"} w-10 h-10 shrink-0`}>
+                          <Globe size={20} className="text-white relative z-10" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-white">{n.name}</p>
                           <p className="text-xs text-slate-500 mt-0.5 truncate">{n.fqdn}</p>
                           <div className="flex gap-3 mt-1.5 text-[10px] text-slate-500">
-                            <span>{n.maxRam >= 1024 ? `${(n.maxRam / 1024).toFixed(0)}G` : `${n.maxRam}M`} RAM</span>
-                            <span>{n.maxDisk >= 1024 ? `${(n.maxDisk / 1024).toFixed(0)}G` : `${n.maxDisk}M`} Disk</span>
-                            <span>{n.serverCount}/{n.maxServers} Servers</span>
+                            <span>💾 {n.maxRam >= 1024 ? `${(n.maxRam / 1024).toFixed(0)}G` : `${n.maxRam}M`} RAM</span>
+                            <span>📀 {n.maxDisk >= 1024 ? `${(n.maxDisk / 1024).toFixed(0)}G` : `${n.maxDisk}M`} Disk</span>
+                            <span>📊 {n.serverCount}/{n.maxServers} servers</span>
                           </div>
                         </div>
-                        <div className={`badge ${isOnline ? "badge-green" : "badge-red"}`}>
+                        <div className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium border ${
+                          isOnline ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-slate-800/50 text-slate-500 border-slate-700/30"
+                        }`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${isOnline ? "bg-emerald-400" : "bg-slate-600"}`} />
                           {isOnline ? "Online" : "Offline"}
                         </div>
                       </button>
@@ -273,97 +353,91 @@ export default function CreateServerWizard() {
           )}
 
           {step === 4 && (
-            <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+            <motion.div key="s4" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold text-white">RAM Allocation</h2>
+                <h2 className="text-lg font-semibold text-white">🧠 RAM Allocation</h2>
                 <p className="text-sm text-slate-400 mt-1">Allocate memory for your server</p>
               </div>
-              <div className="card bg-slate-800/20 border-slate-700/30">
+              <div className="rounded-2xl bg-gradient-to-b from-slate-800/30 to-transparent border border-slate-700/20 p-6">
                 <div className="text-center mb-6">
-                  <div className="inline-flex items-center justify-center gap-2">
-                    <MemoryStick size={24} className="text-ryzen-400" />
-                    <span className="text-4xl font-bold text-white">{ram >= 1024 ? `${(ram / 1024).toFixed(0)}` : ram}</span>
-                    <span className="text-lg text-slate-400">{ram >= 1024 ? "GB" : "MB"}</span>
+                  <div className="inline-flex items-end justify-center gap-1">
+                    <MemoryStick size={28} className="text-ryzen-400 mb-1" />
+                    <span className="text-5xl font-bold text-white font-mono tracking-tight">
+                      {ram >= 1024 ? `${(ram / 1024).toFixed(0)}` : ram}
+                    </span>
+                    <span className="text-lg text-slate-400 mb-1">{ram >= 1024 ? "GB" : "MB"}</span>
                   </div>
                 </div>
                 <input type="range" min={1024} max={32768} step={256} value={ram}
                   onChange={e => setRam(Number(e.target.value))}
-                  className="w-full accent-ryzen-500" />
-                <div className="flex justify-between text-xs text-slate-600 mt-2">
-                  <span>1 GB</span>
-                  <span>4 GB</span>
-                  <span>8 GB</span>
-                  <span>16 GB</span>
-                  <span>32 GB</span>
+                  className="w-full accent-ryzen-500 h-2" />
+                <div className="flex justify-between text-[10px] text-slate-600 mt-2">
+                  <span>1G</span><span>4G</span><span>8G</span><span>16G</span><span>32G</span>
                 </div>
               </div>
             </motion.div>
           )}
 
           {step === 5 && (
-            <motion.div key="step5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+            <motion.div key="s5" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold text-white">CPU Allocation</h2>
-                <p className="text-sm text-slate-400 mt-1">Allocate CPU resources for your server</p>
+                <h2 className="text-lg font-semibold text-white">⚡ CPU Allocation</h2>
+                <p className="text-sm text-slate-400 mt-1">Allocate CPU resources</p>
               </div>
-              <div className="card bg-slate-800/20 border-slate-700/30">
+              <div className="rounded-2xl bg-gradient-to-b from-slate-800/30 to-transparent border border-slate-700/20 p-6">
                 <div className="text-center mb-6">
-                  <div className="inline-flex items-center justify-center gap-2">
-                    <Cpu size={24} className="text-ryzen-400" />
-                    <span className="text-4xl font-bold text-white">{cpu}</span>
-                    <span className="text-lg text-slate-400">%</span>
+                  <div className="inline-flex items-end justify-center gap-1">
+                    <Cpu size={28} className="text-ryzen-400 mb-1" />
+                    <span className="text-5xl font-bold text-white font-mono tracking-tight">{cpu}</span>
+                    <span className="text-lg text-slate-400 mb-1">%</span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">{cpu >= 100 ? `${cpu / 100} core${cpu >= 200 ? "s" : ""}` : "Less than 1 core"}</p>
+                  <p className="text-xs text-slate-500 mt-2">{cpu >= 100 ? `${cpu / 100} core${cpu >= 200 ? "s" : ""}` : "Less than 1 core"}</p>
                 </div>
                 <input type="range" min={50} max={400} step={50} value={cpu}
                   onChange={e => setCpu(Number(e.target.value))}
-                  className="w-full accent-ryzen-500" />
-                <div className="flex justify-between text-xs text-slate-600 mt-2">
-                  <span>0.5 core</span>
-                  <span>1 core</span>
-                  <span>2 cores</span>
-                  <span>3 cores</span>
-                  <span>4 cores</span>
+                  className="w-full accent-ryzen-500 h-2" />
+                <div className="flex justify-between text-[10px] text-slate-600 mt-2">
+                  <span>0.5</span><span>1</span><span>2</span><span>3</span><span>4</span>
                 </div>
               </div>
             </motion.div>
           )}
 
           {step === 6 && (
-            <motion.div key="step6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+            <motion.div key="s6" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-6">
               <div>
-                <h2 className="text-lg font-semibold text-white">Disk Allocation</h2>
-                <p className="text-sm text-slate-400 mt-1">Allocate storage space for your server</p>
+                <h2 className="text-lg font-semibold text-white">💾 Disk Allocation</h2>
+                <p className="text-sm text-slate-400 mt-1">Allocate storage space</p>
               </div>
-              <div className="card bg-slate-800/20 border-slate-700/30">
+              <div className="rounded-2xl bg-gradient-to-b from-slate-800/30 to-transparent border border-slate-700/20 p-6">
                 <div className="text-center mb-6">
-                  <div className="inline-flex items-center justify-center gap-2">
-                    <HardDrive size={24} className="text-ryzen-400" />
-                    <span className="text-4xl font-bold text-white">{disk >= 1024 ? (disk / 1024).toFixed(0) : disk}</span>
-                    <span className="text-lg text-slate-400">{disk >= 1024 ? "GB" : "MB"}</span>
+                  <div className="inline-flex items-end justify-center gap-1">
+                    <HardDrive size={28} className="text-ryzen-400 mb-1" />
+                    <span className="text-5xl font-bold text-white font-mono tracking-tight">
+                      {disk >= 1024 ? (disk / 1024).toFixed(0) : disk}
+                    </span>
+                    <span className="text-lg text-slate-400 mb-1">{disk >= 1024 ? "GB" : "MB"}</span>
                   </div>
                 </div>
                 <input type="range" min={1024} max={102400} step={1024} value={disk}
                   onChange={e => setDisk(Number(e.target.value))}
-                  className="w-full accent-ryzen-500" />
-                <div className="flex justify-between text-xs text-slate-600 mt-2">
-                  <span>1 GB</span>
-                  <span>10 GB</span>
-                  <span>25 GB</span>
-                  <span>50 GB</span>
-                  <span>100 GB</span>
+                  className="w-full accent-ryzen-500 h-2" />
+                <div className="flex justify-between text-[10px] text-slate-600 mt-2">
+                  <span>1G</span><span>10G</span><span>25G</span><span>50G</span><span>100G</span>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-medium text-slate-400">Backups</label>
-                  <select value={backups} onChange={e => setBackups(Number(e.target.value))} className="input-field mt-1.5">
+                  <label className="text-xs font-medium text-slate-400 flex items-center gap-1"><span>💾</span> Backups</label>
+                  <select value={backups} onChange={e => setBackups(Number(e.target.value))}
+                    className="input-field mt-1.5 bg-slate-800/50 border-slate-700/30">
                     {[0, 1, 2, 3, 5, 10].map(n => <option key={n} value={n}>{n}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-slate-400">Databases</label>
-                  <select value={databases} onChange={e => setDatabases(Number(e.target.value))} className="input-field mt-1.5">
+                  <label className="text-xs font-medium text-slate-400 flex items-center gap-1"><span>🗄️</span> Databases</label>
+                  <select value={databases} onChange={e => setDatabases(Number(e.target.value))}
+                    className="input-field mt-1.5 bg-slate-800/50 border-slate-700/30">
                     {[0, 1, 2, 3, 5].map(n => <option key={n} value={n}>{n}</option>)}
                   </select>
                 </div>
@@ -372,19 +446,19 @@ export default function CreateServerWizard() {
           )}
 
           {step === 7 && (
-            <motion.div key="step7" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+            <motion.div key="s7" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} className="space-y-6">
               <div className="text-center py-4">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-ryzen-500/10">
-                  <Rocket size={32} className="text-ryzen-400" />
+                <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-ryzen-500/15 to-red-600/10 border-2 border-ryzen-500/15 ryzen-glow-sm animate-float">
+                  <Rocket size={36} className="text-ryzen-400" />
                 </div>
-                <h2 className="text-xl font-bold text-white">Ready to Deploy</h2>
+                <h2 className="text-xl font-bold text-white">🚀 Ready to Deploy</h2>
                 <p className="text-sm text-slate-400 mt-2">Review your configuration before deploying</p>
               </div>
 
-              <div className="space-y-2">
-                {[
+              <div className="space-y-1.5">
+                {([
                   ["Server Name", name],
-                  ["Software", selectedSoftware?.name || software],
+                  ["Software", selectedSoftware ? `${selectedSoftware.icon} ${selectedSoftware.name}` : software],
                   ["Version", `Minecraft ${version}`],
                   ["Node", nodes.find(n => n.id === nodeId)?.name || nodeId],
                   ["RAM", `${ram >= 1024 ? `${(ram / 1024).toFixed(0)} GB` : `${ram} MB`}`],
@@ -393,8 +467,8 @@ export default function CreateServerWizard() {
                   ["Backups", String(backups)],
                   ["Databases", String(databases)],
                   ["Docker Image", dockerImages[software] || "auto"],
-                ].map(([label, value]) => (
-                  <div key={label} className="flex items-center justify-between rounded-xl bg-slate-800/30 px-4 py-3">
+                ] as const).map(([label, value]) => (
+                  <div key={label} className="flex items-center justify-between rounded-xl bg-slate-800/30 px-4 py-3 border border-slate-700/10">
                     <span className="text-sm text-slate-400">{label}</span>
                     <span className="text-sm font-medium text-white">{value}</span>
                   </div>
@@ -402,17 +476,22 @@ export default function CreateServerWizard() {
               </div>
 
               {error && (
-                <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400">{error}</div>
+                <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400 flex items-center gap-2">
+                  <span>⛔</span> {error}
+                </div>
               )}
 
-              <button onClick={handleDeploy} disabled={loading} className="btn-primary w-full py-4 text-base">
+              <button onClick={handleDeploy} disabled={loading}
+                className="btn-primary w-full py-4 text-base relative overflow-hidden group"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 {loading ? (
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center justify-center gap-2">
                     <span className="animate-spin inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
                     Deploying Server...
                   </span>
                 ) : (
-                  <><Rocket size={18} /> Deploy Server</>
+                  <span className="flex items-center gap-2"><Rocket size={18} /> ⛏️ Deploy Server</span>
                 )}
               </button>
             </motion.div>
@@ -420,16 +499,23 @@ export default function CreateServerWizard() {
         </AnimatePresence>
       </div>
 
+      {/* Navigation */}
       <div className="mt-6 flex items-center justify-between">
-        <button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0} className="btn-secondary">
+        <button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}
+          className="flex items-center gap-2 rounded-xl border border-slate-700/30 bg-slate-900/50 px-5 py-3 text-sm font-medium text-slate-300 hover:bg-slate-800/50 hover:border-slate-600/50 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+        >
           <ChevronLeft size={16} /> Back
         </button>
-        <div className="text-xs text-slate-500">Step {step + 1} of {steps.length}</div>
-        {step < 7 ? (
-          <button onClick={() => setStep(Math.min(7, step + 1))} disabled={!canProceed()} className="btn-primary">
-            Continue <ChevronRight size={16} />
-          </button>
-        ) : null}
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-slate-500">Step {step + 1} of {steps.length}</span>
+          {step < 7 ? (
+            <button onClick={() => setStep(Math.min(7, step + 1))} disabled={!canProceed()}
+              className="btn-primary group"
+            >
+              Continue <ChevronRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          ) : null}
+        </div>
       </div>
     </div>
   );

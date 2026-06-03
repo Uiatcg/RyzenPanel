@@ -48,8 +48,9 @@ export function setupContainerRoutes(app: express.Express) {
     }
 
     try {
+      const safeName = payload.name.toLowerCase().replace(/[^a-z0-9_.-]/g, "").replace(/^[^a-z0-9]+/, "");
       const container = await createContainer({
-        name: payload.name,
+        name: safeName || `ryzen_${Date.now()}`,
         Image: payload.image,
         Cmd: payload.command,
         Env: payload.env,

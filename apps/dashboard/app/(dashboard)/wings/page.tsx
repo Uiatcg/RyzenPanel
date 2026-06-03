@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Radio, Wifi, WifiOff, HardDrive, Cpu, MemoryStick,
   Globe, Server, RefreshCw, Terminal, Copy, Check,
-  ExternalLink, Activity, AlertTriangle, Zap, Clock,
+  ExternalLink, Activity, AlertTriangle, Zap, Diamond,
 } from "lucide-react";
 
 interface WingsNode {
@@ -47,49 +47,51 @@ export default function WingsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/40 border border-slate-800/50 p-8">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-ryzen-500/10 to-transparent rounded-bl-full" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-emerald-500/5 to-transparent rounded-tr-full" />
-        <div className="relative flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-ryzen-500/20 to-emerald-600/20 border border-ryzen-500/20">
-                <Radio size={24} className="text-ryzen-400" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-white">Wings</h1>
-                <p className="text-sm text-slate-400">Manage your Wings daemon nodes</p>
-              </div>
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900/90 via-slate-900/80 to-slate-950/90 border border-slate-700/30 p-8 ryzen-glow"
+      >
+        <div className="absolute -top-24 -right-24 w-80 h-80 bg-gradient-to-bl from-ryzen-500/10 to-transparent rounded-full blur-3xl" />
+        <div className="relative">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-ryzen-500/20 to-red-600/20 border-2 border-ryzen-500/30 ryzen-glow-sm animate-float">
+              <Radio size={26} className="text-ryzen-400" />
             </div>
-            <div className="flex items-center gap-4 mt-4">
-              <div className="flex items-center gap-2 rounded-xl bg-ryzen-500/10 px-4 py-2">
-                <Wifi size={14} className="text-ryzen-400" />
-                <span className="text-sm font-semibold text-ryzen-400">{onlineNodes.length} Online</span>
-              </div>
-              <div className="flex items-center gap-2 rounded-xl bg-slate-800/50 px-4 py-2">
-                <Server size={14} className="text-slate-400" />
-                <span className="text-sm text-slate-400">{nodes.length} Total Nodes</span>
-              </div>
-              <button onClick={fetchNodes} className="btn-ghost text-xs">
-                <RefreshCw size={14} /> Refresh
-              </button>
+            <div>
+              <h1 className="text-2xl font-bold text-white">Wings</h1>
+              <p className="text-sm text-slate-400">Manage your Wings daemon nodes</p>
             </div>
           </div>
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 rounded-xl bg-ryzen-500/10 px-4 py-2 border border-ryzen-500/20">
+              <Wifi size={14} className="text-ryzen-400" />
+              <span className="text-sm font-semibold text-ryzen-400">{onlineNodes.length} Online</span>
+            </div>
+            <div className="flex items-center gap-2 rounded-xl bg-slate-800/50 px-4 py-2 border border-slate-700/30">
+              <Server size={14} className="text-slate-400" />
+              <span className="text-sm text-slate-400">{nodes.length} Total</span>
+            </div>
+            <button onClick={fetchNodes}
+              className="flex items-center gap-1 rounded-lg text-xs text-slate-400 hover:text-slate-200 px-3 py-1.5 hover:bg-slate-800/50 transition-all">
+              <RefreshCw size={14} /> Refresh
+            </button>
+          </div>
         </div>
-      </div>
+      </motion.div>
 
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2">
-          {[1, 2, 3, 4].map(i => <div key={i} className="skeleton h-48" />)}
+          {[1, 2, 3, 4].map(i => <div key={i} className="skeleton h-48 rounded-2xl" />)}
         </div>
       ) : nodes.length === 0 ? (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          className="card flex flex-col items-center justify-center py-20 text-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-ryzen-500/10 to-emerald-600/10 mb-6">
+          className="flex flex-col items-center justify-center py-20 rounded-2xl border border-slate-700/30 bg-gradient-to-b from-slate-900/60 to-slate-900/20"
+        >
+          <div className="w-24 h-24 flex items-center justify-center rounded-3xl bg-slate-800/50 border border-slate-700/30 mb-6 relative">
             <Radio size={40} className="text-ryzen-400" />
+            <span className="absolute -top-1 -right-1 text-lg animate-float">💎</span>
           </div>
           <h2 className="text-xl font-bold text-white mb-2">No Wings Connected</h2>
-          <p className="text-sm text-slate-400 max-w-md">
+          <p className="text-sm text-slate-400 max-w-md text-center">
             Wings nodes are the machines that run your game servers. 
             Add a node in the admin panel to connect a Wings daemon.
           </p>
@@ -98,163 +100,77 @@ export default function WingsPage() {
           </a>
         </motion.div>
       ) : (
-        <>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {nodes.map((node, idx) => (
-              <motion.div key={node.id}
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: idx * 0.05 }}
-                className="card relative overflow-hidden group cursor-pointer hover:border-slate-700/50 transition-all"
+        <div className="grid gap-4 sm:grid-cols-2">
+          {[...onlineNodes, ...offlineNodes].map((node) => {
+            const isOnline = node.status === "online";
+            return (
+              <motion.div key={node.id} layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                className={`rounded-2xl border bg-gradient-to-b from-slate-900/80 to-slate-900/40 p-5 transition-all duration-300 hover:shadow-lg ${
+                  isOnline ? "border-emerald-500/20 hover:border-emerald-500/30" : "border-slate-700/30 hover:border-slate-600/50"
+                } ${selectedNode?.id === node.id ? "ring-1 ring-ryzen-500/30" : ""}`}
                 onClick={() => setSelectedNode(selectedNode?.id === node.id ? null : node)}
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-violet-500/5 to-transparent rounded-bl-full" />
-                <div className="relative">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`rounded-xl p-2.5 ${node.status === "online" ? "bg-ryzen-500/10" : "bg-slate-800"}`}>
-                        <Radio size={18} className={node.status === "online" ? "text-ryzen-400" : "text-slate-500"} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-white">{node.name}</p>
-                        <p className="text-[10px] text-slate-500">{node.location} &middot; {node.fqdn}</p>
-                      </div>
-                    </div>
-                    <div className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-medium ${
-                      node.status === "online" ? "bg-ryzen-500/10 text-ryzen-400" : "bg-red-500/10 text-red-400"
-                    }`}>
-                      {node.status === "online" ? <Wifi size={10} /> : <WifiOff size={10} />}
-                      {node.status}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                    <div className="rounded-lg bg-slate-800/30 p-2.5 text-center">
-                      <Server size={14} className="mx-auto text-slate-500 mb-1" />
-                      <p className="text-xs font-bold text-white">{node._count.servers}</p>
-                      <p className="text-[10px] text-slate-500">Servers</p>
-                    </div>
-                    <div className="rounded-lg bg-slate-800/30 p-2.5 text-center">
-                      <Globe size={14} className="mx-auto text-slate-500 mb-1" />
-                      <p className="text-xs font-bold text-white">{node.daemonPort}</p>
-                      <p className="text-[10px] text-slate-500">Port</p>
-                    </div>
-                    <div className="rounded-lg bg-slate-800/30 p-2.5 text-center">
-                      <Activity size={14} className="mx-auto text-slate-500 mb-1" />
-                      <p className="text-xs font-bold text-white">{node._count.allocations}</p>
-                      <p className="text-[10px] text-slate-500">Allocs</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div>
-                      <div className="flex justify-between text-[10px] text-slate-500 mb-1">
-                        <span><MemoryStick size={10} className="inline mr-1" />RAM</span>
-                        <span>{node.memoryUsed >= 1024 ? `${(node.memoryUsed / 1024).toFixed(1)} GB` : `${node.memoryUsed} MB`} / {node.maxRam >= 1024 ? `${(node.maxRam / 1024).toFixed(0)} GB` : `${node.maxRam} MB`}</span>
-                      </div>
-                      <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
-                        <div className="h-full rounded-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-500"
-                          style={{ width: `${Math.min(100, (node.memoryUsed / Math.max(node.maxRam, 1)) * 100)}%` }} />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-[10px] text-slate-500 mb-1">
-                        <span><HardDrive size={10} className="inline mr-1" />Disk</span>
-                        <span>{node.diskUsed >= 1024 ? `${(node.diskUsed / 1024).toFixed(1)} GB` : `${node.diskUsed} MB`} / {node.maxDisk >= 1024 ? `${(node.maxDisk / 1024).toFixed(0)} GB` : `${node.maxDisk} MB`}</span>
-                      </div>
-                      <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
-                        <div className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500"
-                          style={{ width: `${Math.min(100, (node.diskUsed / Math.max(node.maxDisk, 1)) * 100)}%` }} />
-                      </div>
-                    </div>
-                  </div>
-
-                  {node.lastHeartbeat && (
-                    <p className="text-[10px] text-slate-600 mt-3 flex items-center gap-1">
-                      <Clock size={10} />
-                      Last seen: {new Date(node.lastHeartbeat).toLocaleString()}
-                    </p>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          <AnimatePresence>
-            {selectedNode && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
-                className="card border-ryzen-500/20 bg-gradient-to-br from-slate-900 to-slate-900/50">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="rounded-xl bg-ryzen-500/10 p-2.5">
-                      <Terminal size={20} className="text-ryzen-400" />
+                    <div className={`mc-block ${isOnline ? "mc-block-grass" : "mc-block-stone"} w-10 h-10`}>
+                      <Radio size={20} className="text-white relative z-10" />
                     </div>
                     <div>
-                      <h3 className="text-base font-semibold text-white">Connect Wings - {selectedNode.name}</h3>
-                      <p className="text-xs text-slate-500">Install and connect a Wings daemon to this node</p>
+                      <p className="text-sm font-semibold text-white">{node.name}</p>
+                      <p className="text-[10px] text-slate-500">{node.location} • {node.fqdn}</p>
                     </div>
                   </div>
-                  <button onClick={() => setSelectedNode(null)} className="btn-ghost text-xs">Close</button>
+                  <div className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium border ${
+                    isOnline ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-slate-800/50 text-slate-500 border-slate-700/30"
+                  }`}>
+                    {isOnline ? <Wifi size={10} /> : <WifiOff size={10} />}
+                    {node.status}
+                  </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="rounded-xl bg-slate-800/50 border border-slate-700/30 p-4">
-                    <p className="text-xs font-medium text-slate-400 mb-3">Node Information</p>
-                    <div className="grid grid-cols-2 gap-3 text-xs">
-                      {[
-                        ["Node ID", selectedNode.uuid],
-                        ["Node Name", selectedNode.name],
-                        ["FQDN", selectedNode.fqdn],
-                        ["IP Address", selectedNode.ip],
-                        ["Daemon Port", String(selectedNode.daemonPort)],
-                        ["Status", selectedNode.status],
-                        ["Location", selectedNode.location.toUpperCase()],
-                        ["Max Servers", String(selectedNode.maxServers)],
-                      ].map(([l, v]) => (
-                        <div key={l as string} className="flex items-center justify-between rounded-lg bg-slate-900/50 px-3 py-2">
-                          <span className="text-slate-500">{l as string}</span>
-                          <span className="font-mono text-slate-300 truncate ml-2">{v as string}</span>
-                        </div>
-                      ))}
-                    </div>
+                {/* Metrics grid */}
+                <div className="grid grid-cols-3 gap-2 mb-4">
+                  <div className="rounded-xl bg-slate-800/40 border border-slate-700/20 px-3 py-2 text-center">
+                    <p className="text-xs font-bold text-white">{node._count.servers}</p>
+                    <p className="text-[10px] text-slate-500 flex items-center justify-center gap-0.5"><Server size={9} /> Servers</p>
                   </div>
+                  <div className="rounded-xl bg-slate-800/40 border border-slate-700/20 px-3 py-2 text-center">
+                    <p className="text-xs font-bold text-white">{node.metrics?.dockerRunning ?? node._count.servers}</p>
+                    <p className="text-[10px] text-slate-500 flex items-center justify-center gap-0.5"><Terminal size={9} /> Running</p>
+                  </div>
+                  <div className="rounded-xl bg-slate-800/40 border border-slate-700/20 px-3 py-2 text-center">
+                    <p className="text-xs font-bold text-white">{node.maxServers}</p>
+                    <p className="text-[10px] text-slate-500 flex items-center justify-center gap-0.5"><Globe size={9} /> Max</p>
+                  </div>
+                </div>
 
+                {/* Resource bars */}
+                <div className="space-y-2">
                   <div>
-                    <p className="text-xs font-medium text-slate-400 mb-2">Install Wings Daemon</p>
-                    <div className="relative">
-                      <pre className="rounded-xl bg-slate-950 border border-slate-800 p-4 text-xs font-mono text-ryzen-400 overflow-x-auto whitespace-pre-wrap">
-                        <code>{`# Install Wings on your VPS:
-curl -sSL https://install.ryzenpanel.com/wings.sh | bash
-
-# Then configure and start:
-export PANEL_URL="${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}"
-export NODE_ID="${selectedNode.uuid}"
-export NODE_TOKEN="${selectedNode.uuid}"
-export DAEMON_API_KEY="${selectedNode.uuid}"
-wings --config /etc/ryzenpanel/config.yml`}</code>
-                      </pre>
-                      <button onClick={() => copyToClipboard(`curl -sSL https://install.ryzenpanel.com/wings.sh | bash -s -- --panel-url="${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}" --node-id="${selectedNode.uuid}" --node-token="${selectedNode.uuid}"`)}
-                        className="absolute top-2 right-2 rounded-lg bg-slate-800 p-2 hover:bg-slate-700 transition-colors">
-                        {copied ? <Check size={14} className="text-ryzen-400" /> : <Copy size={14} className="text-slate-400" />}
-                      </button>
+                    <div className="flex justify-between text-[10px] text-slate-500 mb-1">
+                      <span className="flex items-center gap-1"><MemoryStick size={9} className="text-ryzen-400" /> RAM</span>
+                      <span>{node.memoryUsed >= 1024 ? `${(node.memoryUsed / 1024).toFixed(1)}G` : `${node.memoryUsed}M`} / {node.maxRam >= 1024 ? `${(node.maxRam / 1024).toFixed(0)}G` : `${node.maxRam}M`}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-ryzen-500 to-red-500 transition-all duration-500"
+                        style={{ width: `${Math.min(100, (node.memoryUsed / node.maxRam) * 100)}%` }} />
                     </div>
                   </div>
-
-                  <div className="rounded-xl bg-yellow-500/5 border border-yellow-500/20 p-4">
-                    <div className="flex items-start gap-2">
-                      <AlertTriangle size={14} className="text-yellow-400 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="text-xs font-medium text-yellow-400">Important</p>
-                        <p className="text-[11px] text-slate-400 mt-1">
-                          Make sure port {selectedNode.daemonPort} is open on your firewall. 
-                          The Wings daemon must be able to reach this panel at {process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}.
-                        </p>
-                      </div>
+                  <div>
+                    <div className="flex justify-between text-[10px] text-slate-500 mb-1">
+                      <span className="flex items-center gap-1"><HardDrive size={9} className="text-cyan-400" /> Disk</span>
+                      <span>{node.diskUsed >= 1024 ? `${(node.diskUsed / 1024).toFixed(1)}G` : `${node.diskUsed}M`} / {node.maxDisk >= 1024 ? `${(node.maxDisk / 1024).toFixed(0)}G` : `${node.maxDisk}M`}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all duration-500"
+                        style={{ width: `${Math.min(100, (node.diskUsed / node.maxDisk) * 100)}%` }} />
                     </div>
                   </div>
                 </div>
               </motion.div>
-            )}
-          </AnimatePresence>
-        </>
+            );
+          })}
+        </div>
       )}
     </div>
   );

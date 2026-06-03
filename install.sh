@@ -138,9 +138,22 @@ if [[ "$INSTALL_MODE" == "1" ]] || [[ "$INSTALL_MODE" == "3" ]]; then
 
   info "[3/8] Installing PostgreSQL..."
   apt-get install -y postgresql postgresql-contrib
-  systemctl start postgresql
-  systemctl enable postgresql
-  sleep 2
+  # Start PostgreSQL (works on both systemd and non-systemd systems)
+  if command -v systemctl &>/dev/null; then
+    systemctl start postgresql 2>/dev/null || true
+    systemctl enable postgresql 2>/dev/null || true
+  fi
+  service postgresql start 2>/dev/null || true
+  sleep 3
+
+  # Wait for PostgreSQL to be ready
+  for i in $(seq 1 10); do
+    if sudo -u postgres psql -c "SELECT 1;" &>/dev/null; then
+      break
+    fi
+    info "Waiting for PostgreSQL to start... (attempt $i/10)"
+    sleep 2
+  done
 
   info "[4/8] Creating database..."
   sudo -u postgres psql -c "CREATE DATABASE ryzenpanel;" 2>/dev/null || warn "Database already exists"
@@ -158,13 +171,14 @@ if [[ "$INSTALL_MODE" == "1" ]] || [[ "$INSTALL_MODE" == "3" ]]; then
     cd "$PANEL_DIR"
   fi
 
-  info "Installing dependencies..."
+  info "Installing pnpm..."
   npm install -g pnpm 2>/dev/null || true
   pnpm install
 
   info "[6/8] Configuring environment..."
+  DB_PASSWORD_CLEAN=$(echo "$DB_PASSWORD" | sed 's/[&/\]/\\&/g')
   cat > .env << EOF
-DATABASE_URL="postgresql://ryzenpanel:${DB_PASSWORD}@127.0.0.1:5432/ryzenpanel"
+DATABASE_URL="postgresql://ryzenpanel:${DB_PASSWORD_CLEAN}@127.0.0.1:5432/ryzenpanel"
 JWT_SECRET=${JWT_SECRET}
 APP_KEY=${APP_KEY}
 NEXT_PUBLIC_BASE_URL=https://${PANEL_DOMAIN}
@@ -174,9 +188,9 @@ EOF
 
   info "[7/8] Building panel..."
   pnpm prisma generate
-  pnpm db:push || pnpm prisma db push
+  pnpm prisma db push
   pnpm seed
-  pnpm build
+  pnpm --filter @ryzenpanel/dashboard build
 
   info "[8/8] Configuring Nginx..."
   cat > /etc/nginx/sites-available/ryzenpanel << NGINXEOF
@@ -215,7 +229,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=${PANEL_DIR}
-ExecStart=/usr/local/bin/pnpm --filter @ryzenpanel/dashboard start
+ExecStart=$(which pnpm) --filter @ryzenpanel/dashboard start
 Restart=always
 RestartSec=5
 User=root
@@ -247,11 +261,11 @@ if [[ "$INSTALL_MODE" == "2" ]] || [[ "$INSTALL_MODE" == "3" ]]; then
     PANEL_URL="https://${PANEL_DOMAIN}"
     info "Using panel URL: ${PANEL_URL}"
     echo ''
-    echo "  You need to add a Node in the panel admin area,"
-    echo "  or configure the daemon manually after install."
+    echo "  Since panel and daemon are on the same server,"
+    echo "  the daemon will use localhost for API communication."
     echo ''
 
-    read -p "Daemon FQDN / Public IP (for Minecraft clients to connect): " DAEMON_FQDN
+    read -p "Daemon Public IP (for Minecraft clients): " DAEMON_FQDN
     read -p "Daemon Name (e.g., Main Node): " NODE_NAME
     read -p "Location (e.g., New York, USA): " NODE_LOCATION
 
@@ -262,7 +276,7 @@ if [[ "$INSTALL_MODE" == "2" ]] || [[ "$INSTALL_MODE" == "3" ]]; then
 
     cat > /tmp/ryzen_node.sql << SQLEOF
 INSERT INTO "Node" (id, uuid, name, location, fqdn, ip, daemon_port, daemon_key, "nodeSecret", status, "maxRam", "maxDisk", "maxServers")
-VALUES (gen_random_uuid()::text, '${NODE_UUID}', '${NODE_NAME}', '${NODE_LOCATION}', '${DAEMON_FQDN}', '${DAEMON_FQDN}', 8080, '${DAEMON_KEY}', '${NODE_SECRET}', 'offline', 32768, 102400, 10)
+VALUES (gen_random_uuid()::text, '${NODE_UUID}', '${NODE_NAME}', '${NODE_LOCATION}', 'http://localhost:8080', '127.0.0.1', 8080, '${DAEMON_KEY}', '${NODE_SECRET}', 'offline', 32768, 102400, 10)
 ON CONFLICT (uuid) DO NOTHING;
 SQLEOF
     sudo -u postgres psql -d ryzenpanel -f /tmp/ryzen_node.sql 2>/dev/null || warn "Could not auto-create node (panel may not be ready)"
@@ -272,6 +286,7 @@ SQLEOF
     echo "  Node UUID: ${NODE_UUID}"
     echo "  Daemon Key: ${DAEMON_KEY}"
     echo "  Node Secret: ${NODE_SECRET}"
+    echo '  Note: Update FQDN to your public IP in Admin → Nodes for Minecraft clients.'
     echo ''
   else
     read -p "Panel URL (e.g., https://panel.example.com): " PANEL_URL
@@ -303,45 +318,39 @@ SQLEOF
     info "Daemon directory exists, updating..."
     cd "$DAEMON_DIR" && git pull
   else
-    info "Cloning daemon..."
+    info "Cloning RyzenPanel..."
     git clone https://github.com/Uiatcg/RyzenPanel "$DAEMON_DIR"
     cd "$DAEMON_DIR"
   fi
 
-  cd "$DAEMON_DIR/apps/daemon"
-  npm install
-  npm run build
+  info "Installing pnpm..."
+  npm install -g pnpm 2>/dev/null || true
+  pnpm install
+
+  info "Building daemon..."
+  pnpm --filter @ryzenpanel/daemon build
 
   mkdir -p /var/lib/ryzenpanel/servers
   chmod 755 /var/lib/ryzenpanel/servers
 
-  cat > .env << DAEMONENV
+  DAEMON_ENV_DIR="$DAEMON_DIR/apps/daemon"
+
+  cat > "$DAEMON_ENV_DIR/.env" << DAEMONENV
 DAEMON_API_KEY=${DAEMON_KEY}
 DAEMON_PORT=8080
+DAEMON_HTTP_HOST=0.0.0.0
 DAEMON_FILES_ROOT=/var/lib/ryzenpanel/servers
+DAEMON_DATA_ROOT=/var/lib/ryzenpanel
 DAEMON_FQDN=${DAEMON_FQDN}
+DAEMON_IP=${DAEMON_FQDN}
 PANEL_URL=${PANEL_URL}
 NODE_ID=${NODE_UUID}
 NODE_TOKEN=${NODE_SECRET}
-DOCKER_HOST=unix:///var/run/docker.sock
-DAEMON_HTTP_HOST=0.0.0.0
-DAEMON_DATA_ROOT=/var/lib/ryzenpanel
-DAEMON_IP=${DAEMON_FQDN}
-DAEMON_PUBLIC_PORT=25565
-DAEMON_PUBLIC_HOST=${DAEMON_FQDN}
-DAEMON_SFTP_PORT=2022
-DAEMON_SFTP_HOST=0.0.0.0
-DAEMON_UUID=${NODE_UUID}
-DAEMON_SECRET=${NODE_SECRET}
-DAEMON_ENABLE_SSL=false
-DAEMON_HTTP_PORT=8080
-DAEMON_PREFIX=ryzen
-DOCKER_NETWORK=ryzenpanel
-DAEMON_BACKUP_DIR=/var/lib/ryzenpanel/backups
 DOCKER_SOCKET_PATH=/var/run/docker.sock
-EOF
+DOCKER_HOST=unix:///var/run/docker.sock
+DAEMONENV
 
-  cat > /etc/systemd/system/ryzenpanel-daemon.service << 'SERVICEEOF'
+  cat > /etc/systemd/system/ryzenpanel-daemon.service << SERVICEEOF
 [Unit]
 Description=RyzenPanel Wings Daemon
 After=docker.service
@@ -350,8 +359,9 @@ Requires=docker.service
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/opt/ryzenpanel-daemon/apps/daemon
-ExecStart=/usr/bin/node dist/index.js
+WorkingDirectory=${DAEMON_ENV_DIR}
+EnvironmentFile=${DAEMON_ENV_DIR}/.env
+ExecStart=$(which node) ${DAEMON_ENV_DIR}/dist/index.js
 Restart=always
 RestartSec=5
 LimitNOFILE=65536
@@ -361,10 +371,14 @@ WantedBy=multi-user.target
 SERVICEEOF
 
   systemctl daemon-reload
-  systemctl enable docker
-  systemctl restart docker
-  systemctl enable ryzenpanel-daemon
-  systemctl restart ryzenpanel-daemon
+  systemctl enable docker 2>/dev/null || true
+  systemctl restart docker 2>/dev/null || true
+  systemctl enable ryzenpanel-daemon 2>/dev/null || true
+  systemctl restart ryzenpanel-daemon 2>/dev/null || true
+
+  info "Daemon started. Checking logs..."
+  sleep 2
+  journalctl -u ryzenpanel-daemon --no-pager -n 10 2>/dev/null || cat "$DAEMON_ENV_DIR/../..//tmp/ryzen-daemon.log" 2>/dev/null || true
 
   if [[ "$INSTALL_MODE" == "2" ]]; then
     echo ''

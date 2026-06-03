@@ -2,52 +2,312 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Press+Start+2P&display=swap');
 
 :root {
   color-scheme: dark;
   --glass-bg: rgba(15, 23, 42, 0.7);
   --glass-border: rgba(148, 163, 184, 0.08);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  --ryzen-500: #10b981;
-  --ryzen-400: #34d399;
+  --ryzen-500: #ef4444;
+  --ryzen-400: #f87171;
+  --ryzen-300: #fca5a5;
+  --ryzen-600: #dc2626;
+  --ryzen-700: #b91c1c;
+  --mc-grass: #5b8731;
+  --mc-dirt: #8b5e3c;
+  --mc-stone: #7a7a7a;
+  --mc-water: #3c44aa;
+  --mc-gold: #fae02c;
+  --mc-diamond: #2ed9d9;
+  --mc-iron: #c8c8c8;
+  --mc-wood: #6b4226;
+  --mc-sky: #1a1a2e;
+  --mc-sky-top: #0f0f23;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background: #020617;
+  background: var(--mc-sky-top);
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: rgba(15, 15, 35, 0.5); }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.2);
-  border-radius: 3px;
+  background: linear-gradient(180deg, #ef4444, #dc2626);
+  border-radius: 4px;
+  border: 2px solid rgba(15, 15, 35, 0.5);
+}
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #f87171, #ef4444); }
+
+/* ── HD Minecraft Landscape Background ── */
+#mc-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.4);
+/* Sky layers */
+#mc-bg .sky-layer-1 {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg,
+    #0a0a1a 0%,
+    #0f0f2e 15%,
+    #1a1a3e 30%,
+    #1e1e4a 45%,
+    #252555 55%,
+    #1e1e3e 70%,
+    #15152e 85%,
+    #0a0a1a 100%
+  );
 }
 
+#mc-bg .sky-layer-2 {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(239,68,68,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(239,68,68,0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 60%, rgba(59,130,246,0.05) 0%, transparent 50%);
+}
+
+/* Stars */
+#mc-bg .stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 25% 8%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 40% 22%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(1px 1px at 55% 12%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 70% 18%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 85% 10%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1px 1px at 15% 35%, rgba(255,255,255,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 40%, rgba(255,255,255,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 90% 35%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 35% 45%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 22% 50%, rgba(255,255,240,0.3) 0%, transparent 100%),
+    radial-gradient(1px 1px at 75% 48%, rgba(255,255,240,0.4) 0%, transparent 100%),
+    radial-gradient(1px 1px at 42% 28%, rgba(255,255,240,0.5) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 68% 32%, rgba(255,255,240,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 52% 55%, rgba(255,255,240,0.3) 0%, transparent 100%);
+  animation: twinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* Moon */
+#mc-bg .moon {
+  position: absolute;
+  top: 8%;
+  right: 15%;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f0e68c, #daa520 60%, #8b6914);
+  box-shadow: 0 0 40px rgba(218,165,32,0.3), 0 0 80px rgba(218,165,32,0.1);
+  animation: moon-float 8s ease-in-out infinite;
+}
+
+#mc-bg .moon::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(139,105,20,0.3);
+}
+
+#mc-bg .moon::before {
+  content: '';
+  position: absolute;
+  bottom: 12px;
+  right: 10px;
+  width: 12px;
+  height: 25px;
+  border-radius: 50%;
+  background: rgba(139,105,20,0.2);
+  transform: rotate(-20deg);
+}
+
+@keyframes moon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Mountains silhouette */
+#mc-bg .mountains {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+}
+
+#mc-bg .mountains::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -5%;
+  width: 110%;
+  height: 100%;
+  background:
+    /* Far mountains */
+    polygon(0% 100%, 3% 65%, 8% 70%, 12% 55%, 18% 60%, 22% 45%, 28% 55%, 32% 40%, 38% 50%, 42% 35%, 48% 45%, 52% 30%, 58% 40%, 62% 25%, 68% 35%, 72% 20%, 78% 30%, 82% 15%, 88% 25%, 92% 10%, 96% 20%, 100% 15%, 100% 100%)
+    bottom / 100% 100% no-repeat;
+  background-color: #0d0d20;
+  clip-path: polygon(0% 100%, 3% 65%, 8% 70%, 12% 55%, 18% 60%, 22% 45%, 28% 55%, 32% 40%, 38% 50%, 42% 35%, 48% 45%, 52% 30%, 58% 40%, 62% 25%, 68% 35%, 72% 20%, 78% 30%, 82% 15%, 88% 25%, 92% 10%, 96% 20%, 100% 15%, 100% 100%);
+}
+
+#mc-bg .mountains::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: -5%;
+  width: 110%;
+  height: 70%;
+  background: #0f0f25;
+  clip-path: polygon(0% 100%, 5% 75%, 10% 80%, 15% 65%, 22% 72%, 28% 58%, 35% 65%, 40% 50%, 48% 60%, 55% 45%, 62% 55%, 68% 40%, 75% 50%, 80% 35%, 88% 45%, 92% 30%, 100% 40%, 100% 100%);
+}
+
+/* Grass block pattern at bottom */
+#mc-bg .ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 12%;
+  background:
+    linear-gradient(180deg,
+      transparent 0%,
+      rgba(59, 38, 18, 0.4) 20%,
+      rgba(59, 38, 18, 0.6) 50%,
+      rgba(59, 38, 18, 0.8) 100%
+    );
+}
+
+#mc-bg .ground::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(91,135,49,0.3) 0px,
+      rgba(91,135,49,0.3) 15px,
+      rgba(75,115,40,0.3) 15px,
+      rgba(75,115,40,0.3) 16px
+    );
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+}
+
+/* ── Particle System ── */
+#particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(239,68,68,0.4);
+  border-radius: 50%;
+  animation: particle-float linear infinite;
+}
+
+@keyframes particle-float {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% { opacity: 1; }
+  90% { opacity: 0.5; }
+  100% {
+    transform: translateY(-10vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Ember particles (red/orange) */
+.ember {
+  width: 2px;
+  height: 4px;
+  background: linear-gradient(to top, #ef4444, transparent);
+  border-radius: 2px;
+  animation: ember-float ease-in-out infinite;
+}
+
+@keyframes ember-float {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0;
+  }
+  20% { opacity: 1; }
+  80% { opacity: 0.6; }
+  100% {
+    transform: translateY(-200px) translateX(50px) scale(0);
+    opacity: 0;
+  }
+}
+
+/* Portal particle (purple/magenta) */
+.portal-particle {
+  width: 4px;
+  height: 4px;
+  background: rgba(147,51,234,0.5);
+  box-shadow: 0 0 6px rgba(147,51,234,0.3);
+  border-radius: 50%;
+  animation: portal-spiral linear infinite;
+}
+
+@keyframes portal-spiral {
+  0% {
+    transform: rotate(0deg) translateY(0);
+    opacity: 0;
+  }
+  20% { opacity: 0.8; }
+  80% { opacity: 0.6; }
+  100% {
+    transform: rotate(360deg) translateY(-300px);
+    opacity: 0;
+  }
+}
+
+/* ── Minecraft Block Grid Overlay ── */
+.block-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ── Component Classes ── */
 @layer components {
   .glass {
     background: var(--glass-bg);
@@ -69,7 +329,14 @@ body {
   }
 
   .gradient-text {
-    background: linear-gradient(135deg, #34d399, #10b981, #059669);
+    background: linear-gradient(135deg, #f87171, #ef4444, #dc2626);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .mc-gradient-text {
+    background: linear-gradient(135deg, #fae02c, #f87171, #ef4444);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -85,19 +352,87 @@ body {
     inset: 0;
     padding: 1px;
     border-radius: inherit;
-    background: linear-gradient(135deg, rgba(52, 211, 153, 0.3), rgba(16, 185, 129, 0.1), transparent);
+    background: linear-gradient(135deg, rgba(248, 113, 113, 0.3), rgba(239, 68, 68, 0.1), transparent);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     pointer-events: none;
   }
 
+  .ryzen-glow {
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.15), 0 0 60px rgba(239, 68, 68, 0.05);
+  }
+
+  .ryzen-glow-sm {
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.1);
+  }
+
+  .diamond-glow {
+    box-shadow: 0 0 30px rgba(46, 217, 217, 0.15), 0 0 60px rgba(46, 217, 217, 0.05);
+  }
+
+  .gold-glow {
+    box-shadow: 0 0 30px rgba(250, 224, 44, 0.15), 0 0 60px rgba(250, 224, 44, 0.05);
+  }
+
+  /* ── Animations ── */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-5px) rotate(1deg); }
+    66% { transform: translateY(3px) rotate(-1deg); }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.3; box-shadow: 0 0 10px rgba(239,68,68,0.1); }
+    50% { opacity: 1; box-shadow: 0 0 30px rgba(239,68,68,0.3); }
+  }
+
+  @keyframes shimmer-slide {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+  }
+
+  @keyframes block-bounce {
+    0%, 100% { transform: translateY(0) scale(1); }
+    30% { transform: translateY(-6px) scale(1.02); }
+    50% { transform: translateY(0) scale(1); }
+    70% { transform: translateY(-3px) scale(1.01); }
+  }
+
+  @keyframes tooltip-pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    70% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes sweep {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  .animate-float { animation: float 6s ease-in-out infinite; }
+  .animate-float-slow { animation: float-slow 8s ease-in-out infinite; }
+  .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+  .animate-block-bounce { animation: block-bounce 2s ease-in-out infinite; }
+  .animate-tooltip-pop { animation: tooltip-pop 0.2s ease-out forwards; }
+
+  /* ── Input Fields ── */
   .input-field {
     @apply w-full rounded-xl border border-slate-700/50 bg-slate-900/80 px-4 py-3 text-sm text-slate-100 placeholder-slate-500 outline-none transition-all duration-200 focus:border-ryzen-500/50 focus:bg-slate-900/90 focus:ring-1 focus:ring-ryzen-500/20;
   }
 
+  /* ── Buttons ── */
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-ryzen-600 to-ryzen-500 px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:from-ryzen-500 hover:to-ryzen-400 hover:shadow-lg hover:shadow-ryzen-500/25 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary-alt {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:from-violet-500 hover:to-blue-500 hover:shadow-lg hover:shadow-violet-500/25 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
@@ -108,6 +443,7 @@ body {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium text-slate-400 transition-all duration-200 hover:bg-slate-800/50 hover:text-slate-200 active:scale-[0.98];
   }
 
+  /* ── Cards ── */
   .card {
     @apply glass rounded-2xl p-6;
   }
@@ -116,19 +452,53 @@ body {
     @apply card glass-hover;
   }
 
+  /* Minecraft-themed card variants */
+  .card-common {
+    @apply card border-slate-700/30;
+  }
+
+  .card-uncommon {
+    @apply card border-ryzen-500/20 ryzen-glow-sm;
+  }
+
+  .card-rare {
+    @apply card border-violet-500/20;
+    box-shadow: 0 0 20px rgba(147,51,234,0.08);
+  }
+
+  .card-epic {
+    @apply card border-purple-500/20;
+    box-shadow: 0 0 25px rgba(147,51,234,0.12);
+  }
+
+  .card-legendary {
+    @apply card border-amber-400/20 gold-glow;
+  }
+
+  /* ── Skeleton ── */
   .skeleton {
-    background: linear-gradient(90deg, rgba(30, 41, 59, 0.5) 25%, rgba(51, 65, 85, 0.5) 50%, rgba(30, 41, 59, 0.5) 75%);
+    background: linear-gradient(90deg,
+      rgba(30, 41, 59, 0.4) 25%,
+      rgba(51, 65, 85, 0.5) 37%,
+      rgba(30, 41, 59, 0.4) 63%
+    );
     background-size: 200% 100%;
     animation: shimmer 2s infinite;
     border-radius: 0.75rem;
   }
 
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ── Badges ── */
   .badge {
     @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
   }
 
   .badge-green {
-    @apply badge bg-ryzen-500/10 text-ryzen-400;
+    @apply badge bg-emerald-500/10 text-emerald-400;
   }
 
   .badge-red {
@@ -147,6 +517,10 @@ body {
     @apply badge bg-slate-700/30 text-slate-400;
   }
 
+  .badge-legendary {
+    @apply badge bg-amber-400/10 text-amber-400 border border-amber-400/20;
+  }
+
   .divider {
     @apply border-t border-slate-800/50;
   }
@@ -163,9 +537,75 @@ body {
     content: '';
     @apply absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-ryzen-500 to-ryzen-400 rounded-full;
   }
-}
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  /* ── Minecraft Block Icon Placeholder ── */
+  .mc-block {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.5rem;
+    font-size: 1.25rem;
+    border: 2px solid rgba(255,255,255,0.1);
+    image-rendering: pixelated;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mc-block::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.15;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 4px,
+        rgba(255,255,255,0.05) 4px,
+        rgba(255,255,255,0.05) 5px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 4px,
+        rgba(255,255,255,0.05) 4px,
+        rgba(255,255,255,0.05) 5px
+      );
+  }
+
+  .mc-block-grass { background: linear-gradient(135deg, #5b8731, #4a7530); }
+  .mc-block-dirt { background: linear-gradient(135deg, #8b5e3c, #7a5030); }
+  .mc-block-stone { background: linear-gradient(135deg, #7a7a7a, #666); }
+  .mc-block-wood { background: linear-gradient(135deg, #6b4226, #5a3820); }
+  .mc-block-water { background: linear-gradient(135deg, #3c44aa, #3038a0); }
+  .mc-block-gold { background: linear-gradient(135deg, #fae02c, #d4c020); }
+  .mc-block-diamond { background: linear-gradient(135deg, #2ed9d9, #20b0b0); }
+  .mc-block-iron { background: linear-gradient(135deg, #c8c8c8, #aaa); }
+  .mc-block-redstone { background: linear-gradient(135deg, #dc2626, #b02020); }
+  .mc-block-lava { background: linear-gradient(135deg, #ff6b35, #e05020); }
+  .mc-block-obsidian { background: linear-gradient(135deg, #1a0533, #0f0020); }
+  .mc-block-end { background: linear-gradient(135deg, #1a3a1a, #0f2f0f); }
+  .mc-block-nether { background: linear-gradient(135deg, #4a0000, #300000); }
+  .mc-block-paper { background: linear-gradient(135deg, #f5deb3, #e0c8a0); }
+
+  /* ── Rarity Colors ── */
+  .rarity-common { color: #c8c8c8; }
+  .rarity-uncommon { color: #2ed9d9; }
+  .rarity-rare { color: #3b82f6; }
+  .rarity-epic { color: #a855f7; }
+  .rarity-legendary { color: #fae02c; }
+
+  .bg-rarity-common { background: rgba(200,200,200,0.1); }
+  .bg-rarity-uncommon { background: rgba(46,217,217,0.1); }
+  .bg-rarity-rare { background: rgba(59,130,246,0.1); }
+  .bg-rarity-epic { background: rgba(168,85,247,0.1); }
+  .bg-rarity-legendary { background: rgba(250,224,44,0.1); }
+
+  .border-rarity-common { border-color: rgba(200,200,200,0.2); }
+  .border-rarity-uncommon { border-color: rgba(46,217,217,0.2); }
+  .border-rarity-rare { border-color: rgba(59,130,246,0.2); }
+  .border-rarity-epic { border-color: rgba(168,85,247,0.2); }
+  .border-rarity-legendary { border-color: rgba(250,224,44,0.2); }
 }

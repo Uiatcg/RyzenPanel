@@ -105,6 +105,6 @@ export async function POST(req: Request) {
     fqdn: node.fqdn,
     nodeSecret: node.nodeSecret,
     daemonKey: node.daemonKey,
-    installCommand: `curl -sSL https://install.ryzenpanel.com/daemon.sh | bash -s -- --panel-url="${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}" --node-id="${node.uuid}" --node-token="${node.nodeSecret}"`,
+    startCommand: `cd ryzenpanel/daemon && export DAEMON_API_KEY="${node.daemonKey}" DAEMON_FQDN="${node.fqdn}" PANEL_URL="${process.env.NEXT_PUBLIC_BASE_URL || "https://YOUR_PANEL_DOMAIN"}" NODE_ID="${node.uuid}" NODE_TOKEN="${node.nodeSecret}" && nohup node dist/index.js > /tmp/ryzen-daemon.log 2>&1 &`,
   }, { status: 201 });
 }
