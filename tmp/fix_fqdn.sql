@@ -1,0 +1,1 @@
+UPDATE public."Node" SET fqdn = '34.34.96.91' WHERE fqdn = '0.0.0.0';

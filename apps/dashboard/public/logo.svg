@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="ryzenGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="50%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad)"/>
+  <rect x="8" y="8" width="496" height="496" rx="88" fill="none" stroke="url(#ryzenGrad)" stroke-width="2" opacity="0.3"/>
+  <!-- RYZEN R -->
+  <g filter="url(#glow)">
+    <path d="M160 160h80l40 96-40 96h-40l32-80H192V160z" fill="url(#ryzenGrad)"/>
+    <rect x="192" y="320" width="176" height="32" rx="16" fill="url(#ryzenGrad)"/>
+  </g>
+  <!-- Circuit lines -->
+  <path d="M256 160v80l40 20" stroke="#34d399" stroke-width="2" opacity="0.4" fill="none"/>
+  <path d="M368 256H320" stroke="#10b981" stroke-width="2" opacity="0.6" fill="none"/>
+  <circle cx="368" cy="256" r="4" fill="#34d399" opacity="0.8"/>
+  <circle cx="256" cy="160" r="4" fill="#34d399" opacity="0.8"/>
+  <!-- Small decorative dots -->
+  <circle cx="160" cy="320" r="3" fill="#34d399" opacity="0.5"/>
+  <circle cx="320" cy="352" r="2" fill="#10b981" opacity="0.4"/>
+  <circle cx="280" cy="280" r="2" fill="#059669" opacity="0.3"/>
+</svg>

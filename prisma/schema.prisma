@@ -1,0 +1,424 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ServerStatus {
+  ONLINE
+  OFFLINE
+  STARTING
+  STOPPING
+  RESTARTING
+  SUSPENDED
+  INSTALLING
+  INSTALL_FAILED
+}
+
+enum ActivityStatus {
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+enum TicketStatus {
+  OPEN
+  REPLIED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum InvoiceStatus {
+  PENDING
+  PAID
+  CANCELLED
+  REFUNDED
+}
+
+enum PlanName {
+  FREE
+  STARTER
+  PRO
+  ENTERPRISE
+}
+
+model User {
+  id             String               @id @default(uuid())
+  email          String               @unique
+  username       String               @unique
+  password       String
+  role           Role                 @default(USER)
+  emailVerified  Boolean              @default(false)
+  credits        Float                @default(0)
+  planId         String?
+  plan           Plan?                @relation(fields: [planId], references: [id])
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  sessions       Session[]
+  oauthAccounts  OAuthAccount[]
+  resetTokens    PasswordResetToken[]
+  servers        Server[]
+  activities     ActivityLog[]
+  auditLogs      AuditLog[]
+  tickets        Ticket[]
+  ticketMessages TicketMessage[]
+  invoices       Invoice[]
+
+  @@index([email])
+  @@index([username])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  token        String   @unique
+  userAgent    String?
+  ipAddress    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  lastActiveAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  token      String   @unique
+  expiresAt  DateTime
+  used       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+}
+
+model OAuthAccount {
+  id           String   @id @default(uuid())
+  provider     String
+  providerId   String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  accessToken  String
+  refreshToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([provider, providerId])
+  @@index([userId])
+}
+
+model Plan {
+  id        String    @id @default(uuid())
+  name      PlanName  @unique
+  ram       Int
+  cpu       Int
+  disk      Int
+  backups   Int       @default(0)
+  databases Int       @default(0)
+  price     Float
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  users     User[]
+}
+
+model Coupon {
+  id         String   @id @default(uuid())
+  code       String   @unique
+  discount   Int
+  maxUses    Int      @default(0)
+  usedCount  Int      @default(0)
+  expiresAt  DateTime?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Node {
+  id              String        @id @default(uuid())
+  uuid            String        @unique @default(uuid())
+  name            String
+  description     String?
+  location        String
+  fqdn            String
+  ip              String
+  isPublic        Boolean       @default(true)
+  status          String        @default("offline")
+  daemonPort      Int           @default(8080)
+  daemonKey       String
+  nodeSecret      String
+  maxRam          Int
+  maxDisk         Int
+  maxServers      Int           @default(1)
+  allocateMemory  Int           @default(0)
+  allocateDisk    Int           @default(0)
+  memoryUsed      Int           @default(0)
+  diskUsed        Int           @default(0)
+  lastHeartbeat   DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  servers         Server[]
+  allocations     Allocation[]
+  metrics         NodeMetric[]
+
+  @@index([name])
+  @@index([uuid])
+}
+
+model NodeMetric {
+  id            String   @id @default(uuid())
+  node          Node     @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  nodeId        String
+  cpuPercent    Float
+  memoryUsed    BigInt
+  memoryTotal   BigInt
+  diskUsed      BigInt
+  diskTotal     BigInt
+  networkRx     BigInt?
+  networkTx     BigInt?
+  dockerRunning Int      @default(0)
+  recordedAt    DateTime @default(now())
+
+  @@index([nodeId, recordedAt])
+}
+
+model Server {
+  id            String        @id @default(uuid())
+  uuid          String        @unique @default(uuid())
+  name          String
+  description   String?
+  owner         User?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId       String?
+  node          Node          @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  nodeId        String
+  egg           Egg           @relation(fields: [eggId], references: [id], onDelete: Cascade)
+  eggId         String
+  status        ServerStatus  @default(OFFLINE)
+  suspended     Boolean       @default(false)
+
+  cpu           Int           @default(0)
+  ram           Int           @default(0)
+  disk          Int           @default(0)
+  io            Int           @default(500)
+
+  ip            String?
+  port          Int?
+  allocations   Allocation[] @relation("ServerAllocation")
+
+  dockerImage   String
+  startup       String
+  environment   Json          @default("{}")
+  containerId   String?
+
+  backups       Backup[]
+  databases     Database[]
+  schedules     Schedule[]
+  activities    ActivityLog[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([name])
+  @@index([nodeId])
+  @@index([ownerId])
+}
+
+model Allocation {
+  id        String   @id @default(uuid())
+  node      Node     @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  nodeId    String
+  server    Server?  @relation("ServerAllocation", fields: [serverId], references: [id], onDelete: SetNull)
+  serverId  String?
+  ip        String
+  port      Int
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@index([nodeId])
+  @@index([serverId])
+}
+
+model Nest {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  eggs        Egg[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Egg {
+  id          String   @id @default(uuid())
+  nest        Nest     @relation(fields: [nestId], references: [id], onDelete: Cascade)
+  nestId      String
+  name        String
+  description String?
+  dockerImage String
+  startup     String
+  configFiles Json     @default("{}")
+  configStop  String   @default("^C")
+  configLogs  Json     @default("{}")
+  scripts     Json     @default("{}")
+  servers     Server[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Backup {
+  id            String   @id @default(uuid())
+  server        Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId      String
+  uuid          String   @unique @default(uuid())
+  name          String
+  ignoredFiles  Json      @default("[]")
+  isSuccessful  Boolean  @default(false)
+  isLocked      Boolean  @default(false)
+  checksum      String?
+  bytes         Int      @default(0)
+  createdAt     DateTime @default(now())
+  completedAt   DateTime?
+
+  @@index([serverId])
+}
+
+model Database {
+  id          String   @id @default(uuid())
+  server      Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId    String
+  database    String
+  username    String
+  password    String
+  remote      String   @default("%")
+  host        String   @default("127.0.0.1")
+  port        Int      @default(3306)
+  createdAt   DateTime @default(now())
+
+  @@index([serverId])
+}
+
+model Schedule {
+  id            String   @id @default(uuid())
+  server        Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  serverId      String
+  name          String
+  cronMinute    String
+  cronHour      String
+  cronDayOfMonth String
+  cronMonth     String
+  cronDayOfWeek String
+  isActive      Boolean  @default(true)
+  isProcessing  Boolean  @default(false)
+  lastRunAt     DateTime?
+  nextRunAt     DateTime?
+  tasks         ScheduleTask[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([serverId])
+}
+
+model ScheduleTask {
+  id          String   @id @default(uuid())
+  schedule    Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  scheduleId  String
+  sequenceId  Int
+  action      String
+  payload     String
+  timeOffset  Int      @default(0)
+  isQueued    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ActivityLog {
+  id        String         @id @default(uuid())
+  server    Server?        @relation(fields: [serverId], references: [id], onDelete: SetNull)
+  serverId  String?
+  user      User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId    String?
+  title     String
+  detail    String?
+  status    ActivityStatus @default(SUCCESS)
+  createdAt DateTime       @default(now())
+
+  @@index([serverId])
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  action    String
+  metadata  Json
+  ipAddress String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Ticket {
+  id        String       @id @default(uuid())
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  subject   String
+  priority  TicketPriority @default(MEDIUM)
+  category  String       @default("general")
+  status    TicketStatus @default(OPEN)
+  messages  TicketMessage[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  @@index([userId])
+  @@index([status])
+}
+
+model TicketMessage {
+  id        String   @id @default(uuid())
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  ticketId  String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  message   String
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([ticketId])
+  @@index([userId])
+}
+
+model Invoice {
+  id          String        @id @default(uuid())
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  amount      Float
+  status      InvoiceStatus @default(PENDING)
+  description String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([userId])
+}
+
+model Announcement {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
