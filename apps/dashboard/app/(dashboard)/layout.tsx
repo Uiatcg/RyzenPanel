@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
-import { Sidebar } from "@/src/components/Sidebar";
+import { JungleSidebar } from "@/src/components/JungleSidebar";
 import { Navbar } from "@/src/components/Navbar";
 import { BottomNav } from "@/src/components/BottomNav";
 import { CommandPalette } from "@/src/components/CommandPalette";
+import { AudioPlayer } from "@/src/components/AudioPlayer";
+import { JungleParticles } from "@/src/components/JungleParticles";
 import { auth } from "@/src/lib/auth-utils";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
@@ -11,7 +13,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   return (
     <div className="flex h-screen overflow-hidden">
       <div className="hidden lg:flex">
-        <Sidebar isAdmin={user?.role === "ADMIN"} />
+        <JungleSidebar isAdmin={user?.role === "ADMIN"} />
       </div>
       <div className="flex flex-1 flex-col overflow-hidden">
         <Navbar />
@@ -21,6 +23,8 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       </div>
       <BottomNav />
       <CommandPalette isAdmin={user?.role === "ADMIN"} />
+      <AudioPlayer />
+      <JungleParticles />
     </div>
   );
 }

@@ -2,13 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Palette, Save, Check } from "lucide-react";
+import { Palette, Save, Check, Image, Video, Type, Image as ImageIcon } from "lucide-react";
 
 export default function BrandSettingsPage() {
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState<any>({
     panelName: "RYZENPANEL",
     logoUrl: "/favicon.svg",
     primaryColor: "#ef4444",
+    heroImageUrl: "",
+    heroVideoUrl: "",
+    bannerUrl: "",
+    tagline: "The ultimate Minecraft server hosting experience. Deploy, manage, and scale your servers with ease.",
   });
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -17,7 +21,7 @@ export default function BrandSettingsPage() {
     fetch("/api/admin/settings")
       .then(r => r.json())
       .then(d => {
-        if (d.panelName) setSettings(d);
+        if (d.panelName) setSettings((prev: any) => ({ ...prev, ...d }));
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -33,6 +37,16 @@ export default function BrandSettingsPage() {
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     }
+  }
+
+  function FieldPreview({ label, url }: { label: string; url: string }) {
+    if (!url) return null;
+    return (
+      <div className="mt-2 flex items-center gap-3 rounded-xl bg-slate-800/50 border border-slate-700/30 p-3">
+        <img src={url} alt={label} className="h-10 w-10 rounded-lg object-cover bg-slate-900" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+        <span className="text-xs text-slate-400">{label} preview</span>
+      </div>
+    );
   }
 
   if (loading) return <div className="p-6"><div className="skeleton h-96" /></div>;
@@ -57,6 +71,11 @@ export default function BrandSettingsPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
         className="rounded-2xl border border-slate-700/30 bg-gradient-to-b from-slate-900/80 to-slate-900/40 p-6 space-y-6"
       >
+        <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+          <Type size={14} className="text-ryzen-400" />
+          Identity
+        </h3>
+
         <div>
           <label className="text-xs font-medium text-slate-400">Panel Name</label>
           <input value={settings.panelName}
@@ -66,17 +85,11 @@ export default function BrandSettingsPage() {
         </div>
 
         <div>
-          <label className="text-xs font-medium text-slate-400">Logo URL</label>
-          <input value={settings.logoUrl}
-            onChange={e => setSettings({ ...settings, logoUrl: e.target.value })}
-            className="input-field mt-1.5" placeholder="/favicon.svg" />
-          <p className="text-[10px] text-slate-500 mt-1">URL to your logo image (SVG or PNG)</p>
-          {settings.logoUrl && (
-            <div className="mt-3 flex items-center gap-3 rounded-xl bg-slate-800/50 border border-slate-700/30 p-3">
-              <img src={settings.logoUrl} alt="Preview" className="w-10 h-10 rounded-lg object-contain bg-slate-900" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-              <span className="text-xs text-slate-400">Logo preview</span>
-            </div>
-          )}
+          <label className="text-xs font-medium text-slate-400">Tagline</label>
+          <input value={settings.tagline || ""}
+            onChange={e => setSettings({ ...settings, tagline: e.target.value })}
+            className="input-field mt-1.5" placeholder="Premium Minecraft hosting..." />
+          <p className="text-[10px] text-slate-500 mt-1">Shown on the home page hero</p>
         </div>
 
         <div>
@@ -90,19 +103,71 @@ export default function BrandSettingsPage() {
               className="input-field flex-1 font-mono" placeholder="#ef4444" />
           </div>
         </div>
+      </motion.div>
 
-        <div className="rounded-xl bg-slate-800/30 border border-slate-700/20 p-4">
-          <p className="text-xs text-slate-500">
-            <span className="text-ryzen-400 font-medium">Note:</span> The "RYZENPANEL" brand watermark and "Made with ❤️ by RtxRyzen / RtxRyzenx3D" footer are permanent and cannot be removed.
-          </p>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+        className="rounded-2xl border border-slate-700/30 bg-gradient-to-b from-slate-900/80 to-slate-900/40 p-6 space-y-6"
+      >
+        <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+          <Image size={14} className="text-ryzen-400" />
+          Images & Media
+        </h3>
+
+        <div>
+          <label className="text-xs font-medium text-slate-400">Logo URL</label>
+          <input value={settings.logoUrl}
+            onChange={e => setSettings({ ...settings, logoUrl: e.target.value })}
+            className="input-field mt-1.5" placeholder="/favicon.svg" />
+          <p className="text-[10px] text-slate-500 mt-1">URL to your logo image (SVG or PNG)</p>
+          <FieldPreview label="Logo" url={settings.logoUrl} />
         </div>
 
-        <button onClick={handleSave}
-          className="btn-primary w-full flex items-center justify-center gap-2"
-        >
-          {saved ? <><Check size={16} /> Saved!</> : <><Save size={16} /> Save Settings</>}
-        </button>
+        <div>
+          <label className="text-xs font-medium text-slate-400">Banner URL</label>
+          <input value={settings.bannerUrl || ""}
+            onChange={e => setSettings({ ...settings, bannerUrl: e.target.value })}
+            className="input-field mt-1.5" placeholder="https://i.imgur.com/your-banner.png" />
+          <p className="text-[10px] text-slate-500 mt-1">Wide banner image shown in announcements</p>
+          {settings.bannerUrl && (
+            <div className="mt-2 rounded-xl overflow-hidden border border-slate-700/30">
+              <img src={settings.bannerUrl} alt="Banner preview" className="w-full h-24 object-cover" onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }} />
+            </div>
+          )}
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-slate-400">Home Page Hero Image</label>
+          <input value={settings.heroImageUrl || ""}
+            onChange={e => setSettings({ ...settings, heroImageUrl: e.target.value })}
+            className="input-field mt-1.5" placeholder="https://i.imgur.com/your-hero.png" />
+          <p className="text-[10px] text-slate-500 mt-1">Background image for the home hero section</p>
+          {settings.heroImageUrl && (
+            <div className="mt-2 rounded-xl overflow-hidden border border-slate-700/30">
+              <img src={settings.heroImageUrl} alt="Hero preview" className="w-full h-32 object-cover" onError={(e) => { (e.target as HTMLImageElement).parentElement!.style.display = "none"; }} />
+            </div>
+          )}
+        </div>
+
+        <div>
+          <label className="text-xs font-medium text-slate-400">Home Page Hero Video</label>
+          <input value={settings.heroVideoUrl || ""}
+            onChange={e => setSettings({ ...settings, heroVideoUrl: e.target.value })}
+            className="input-field mt-1.5" placeholder="https://example.com/your-video.mp4" />
+          <p className="text-[10px] text-slate-500 mt-1">Background video (MP4) — takes priority over image</p>
+        </div>
       </motion.div>
+
+      <div className="rounded-xl bg-slate-800/30 border border-slate-700/20 p-4">
+        <p className="text-xs text-slate-500">
+          <span className="text-ryzen-400 font-medium">Note:</span> The "RYZENPANEL" brand watermark and "Made with ❤️ by RtxRyzen / RtxRyzenx3D" footer are permanent and cannot be removed.
+        </p>
+      </div>
+
+      <button onClick={handleSave}
+        className="btn-primary w-full flex items-center justify-center gap-2"
+      >
+        {saved ? <><Check size={16} /> Saved!</> : <><Save size={16} /> Save Settings</>}
+      </button>
     </div>
   );
 }

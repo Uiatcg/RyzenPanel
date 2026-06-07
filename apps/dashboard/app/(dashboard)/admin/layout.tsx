@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import {
   Shield, Users, Server, HardDrive, Globe, Ticket,
   CreditCard, Percent, Megaphone, Database, Palette,
+  ToggleLeft, ShieldCheck,
 } from "lucide-react";
 
 const adminLinks = [
@@ -21,6 +22,8 @@ const adminLinks = [
   { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
   { href: "/admin/backups", label: "Backups", icon: Database },
   { href: "/admin/settings", label: "Brand Settings", icon: Palette },
+  { href: "/admin/permissions", label: "Permissions", icon: ShieldCheck },
+  { href: "/admin/toggles", label: "Feature Toggles", icon: ToggleLeft },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

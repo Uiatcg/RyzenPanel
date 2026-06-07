@@ -1,277 +1,409 @@
 "use client";
 
-import { motion } from "framer-motion";
-import {
-  Server, Activity, Plus, Wifi, HardDrive, MemoryStick,
-  Zap, ArrowRight, Globe, Cpu, Sword, Shield, Diamond,
-  Pickaxe, Sparkles, Users,
-} from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import type { ServerCardData, ActivityItem } from "@/src/types/dashboard";
+import {
+  Server, Shield, Zap, Globe, Cpu, HardDrive, MemoryStick,
+  ArrowRight, Plus, ChevronDown, Check, X, Star, MessageSquare,
+  Wifi, Clock, Users, Sparkles, Crown, Heart, MapPin,
+  Diamond, Sword, Pickaxe, TreePine, Leaf, Bug,
+  Flame, Droplets, Wind, Mountain,
+} from "lucide-react";
+import { JungleVideoBackground } from "@/src/components/JungleVideoBackground";
 
-interface HomeClientProps {
-  user: any;
-  overview: {
-    summary: { totalServers: number; activeServers: number; alerts: number; userServers: number; uptime: string };
-    graphs: { cpu: { label: string; value: number }[]; ram: { label: string; value: number }[]; storage: { label: string; value: number }[] };
-  };
-  servers: ServerCardData[];
-  activity: ActivityItem[];
-}
+const c = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08 } } };
+const it = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 80, damping: 15 } } };
 
-const container = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08 } } };
-const item = { hidden: { opacity: 0, y: 24 }, show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 90, damping: 15 } } };
-
-const blockIcons = [
-  { icon: Diamond, rarity: "legendary", label: "Premium" },
-  { icon: Sword, rarity: "rare", label: "Combat Ready" },
-  { icon: Shield, rarity: "uncommon", label: "Protected" },
-  { icon: Pickaxe, rarity: "common", label: "Mining" },
+const plans = [
+  { name: "Sprout", price: "Free", period: "", ram: "1 GB", cpu: "100%", disk: "5 GB", features: ["Basic DDoS Protection", "Community Support", "1 Server"], popular: false, color: "emerald" },
+  { name: "Sapling", price: "$4.99", period: "/mo", ram: "4 GB", cpu: "200%", disk: "20 GB", features: ["Advanced DDoS Protection", "Priority Support", "5 Backups", "Custom Domain"], popular: false, color: "emerald" },
+  { name: "Ancient Oak", price: "$14.99", period: "/mo", ram: "16 GB", cpu: "400%", disk: "50 GB", features: ["Enterprise DDoS Protection", "24/7 Priority Support", "Unlimited Backups", "Custom Domain", "Dedicated IP"], popular: true, color: "gold" },
+  { name: "World Tree", price: "$49.99", period: "/mo", ram: "64 GB", cpu: "800%", disk: "200 GB", features: ["Everything in Ancient Oak", "Dedicated Resources", "White-glove Migration", "Custom Startup", "SLA Guarantee"], popular: false, color: "gold" },
 ];
 
-export function HomeClient({ user, overview, servers, activity }: HomeClientProps) {
-  const stats = [
-    {
-      label: "Your Servers", value: overview.summary.userServers, icon: Server,
-      bg: "bg-ryzen-500/10", border: "border-ryzen-500/20",
-      blockClass: "mc-block mc-block-redstone", desc: "Total owned",
-      emoji: "⚔️",
-    },
-    {
-      label: "Active Now", value: overview.summary.activeServers, icon: Wifi,
-      bg: "bg-emerald-500/10", border: "border-emerald-500/20",
-      blockClass: "mc-block mc-block-grass", desc: "Running servers",
-      emoji: "🟢",
-    },
-    {
-      label: "Total Capacity", value: overview.summary.totalServers, icon: Globe,
-      bg: "bg-violet-500/10", border: "border-violet-500/20",
-      blockClass: "mc-block mc-block-diamond", desc: "Across all nodes",
-      emoji: "💎",
-    },
-    {
-      label: "Uptime", value: overview.summary.uptime || "99.9%", icon: Activity,
-      bg: "bg-amber-500/10", border: "border-amber-500/20",
-      blockClass: "mc-block mc-block-gold", desc: "Service level",
-      emoji: "⭐",
-    },
-  ];
+const features = [
+  { icon: Shield, title: "DDoS Protection", desc: "Enterprise-grade protection absorbing attacks up to 1Tbps. Your jungle fortress is impenetrable.", color: "from-[#3DDC84] to-[#1FA855]" },
+  { icon: Zap, title: "Instant Deployment", desc: "Deploy your Minecraft server in under 30 seconds. One-click installation for all modpacks.", color: "from-[#D4A017] to-[#B8860B]" },
+  { icon: Cpu, title: "Ryzen & Intel CPUs", desc: "Latest generation processors with high single-thread performance for max TPS.", color: "from-[#3DDC84] to-[#28A745]" },
+  { icon: HardDrive, title: "NVMe SSD Storage", desc: "Blazing fast NVMe drives for instant world loading and zero lag chunk generation.", color: "from-[#3DDC84] to-[#1FA855]" },
+  { icon: Globe, title: "Global Locations", desc: "Servers in 6 continents. Low latency no matter where your players are.", color: "from-[#D4A017] to-[#B8860B]" },
+  { icon: Clock, title: "99.9% Uptime SLA", desc: "Our jungle infrastructure guarantees maximum uptime for your server.", color: "from-[#3DDC84] to-[#28A745]" },
+];
+
+const reviews = [
+  { name: "xJungleKing", avatar: "JK", role: "Server Owner", rating: 5, text: "Best hosting I've ever used. My 50-player server runs at 20 TPS constant. The support team responds in minutes!", server: "MC-Hub" },
+  { name: "EmeraldCraft", avatar: "EC", role: "Modpack Dev", rating: 5, text: "Migrated my entire modded server in 5 minutes. Zero downtime. The performance is unreal compared to my old host.", server: "EmeraldSMP" },
+  { name: "WildMiner99", avatar: "WM", role: "Network Admin", rating: 5, text: "Running a 3-server BungeeCord network with zero issues. The DDoS protection actually works — got hit and nothing happened.", server: "WildNetwork" },
+  { name: "TropicalMC", avatar: "TM", role: "Content Creator", rating: 4, text: "Switched from a big name host and never looked back. Better performance, better support, better price. Simple.", server: "TropicalSMP" },
+];
+
+const locations = [
+  { city: "New York", country: "USA", flag: "🇺🇸", ping: "~15ms", servers: "500+" },
+  { city: "London", country: "UK", flag: "🇬🇧", ping: "~20ms", servers: "350+" },
+  { city: "Frankfurt", country: "Germany", flag: "🇩🇪", ping: "~18ms", servers: "400+" },
+  { city: "Tokyo", country: "Japan", flag: "🇯🇵", ping: "~25ms", servers: "300+" },
+  { city: "Sydney", country: "Australia", flag: "🇦🇺", ping: "~30ms", servers: "200+" },
+  { city: "São Paulo", country: "Brazil", flag: "🇧🇷", ping: "~35ms", servers: "150+" },
+];
+
+const faqs = [
+  { q: "How fast can I deploy a server?", a: "Under 30 seconds. Select your plan, pick your software, and your server is live instantly." },
+  { q: "Can I switch plans later?", a: "Absolutely. Upgrade or downgrade anytime. We'll prorate the difference automatically." },
+  { q: "Do you support modpacks?", a: "Yes! We support all major modpacks — CurseForge, Modrinth, FTB, and more. One-click installation." },
+  { q: "What payment methods do you accept?", a: "We accept all major credit cards, PayPal, and cryptocurrency." },
+  { q: "Is there a money-back guarantee?", a: "Yes, 7-day money-back guarantee on all paid plans. No questions asked." },
+  { q: "Can I migrate from another host?", a: "Yes! Our support team will migrate your server for free on any paid plan." },
+];
+
+const stats = [
+  { value: "15,000+", label: "Servers Deployed", icon: Server },
+  { value: "99.9%", label: "Uptime SLA", icon: Clock },
+  { value: "50,000+", label: "Happy Users", icon: Users },
+  { value: "6", label: "Global Locations", icon: Globe },
+];
+
+export function HomeClient({ user, overview, servers, activity, brandSettings }: any) {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const panelName = brandSettings?.panelName || "ZungleVibe";
 
   return (
-    <motion.div variants={container} initial="hidden" animate="show" className="p-6 space-y-6">
-      {/* Hero Banner */}
-      <motion.div variants={item}>
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900/90 via-slate-900/80 to-slate-950/90 border border-slate-700/30 ryzen-glow">
-          {/* Animated decorative blocks */}
-          <div className="absolute -top-10 -right-10 w-40 h-40 opacity-[0.04]">
-            <div className="mc-block mc-block-diamond w-full h-full text-6xl flex items-center justify-center">◆</div>
-          </div>
-          <div className="absolute -bottom-8 -left-8 w-32 h-32 opacity-[0.03] rotate-45">
-            <div className="mc-block mc-block-gold w-full h-full text-5xl flex items-center justify-center">★</div>
-          </div>
-          <div className="absolute top-1/2 right-1/4 w-24 h-24 opacity-[0.02] animate-float">
-            <div className="mc-block mc-block-redstone w-full h-full text-4xl flex items-center justify-center">⬡</div>
+    <div className="min-h-screen">
+      {/* ═══ HERO ═══ */}
+      <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
+        <JungleVideoBackground
+          videoUrl={brandSettings?.heroVideoUrl}
+          imageUrl={brandSettings?.heroImageUrl}
+          overlayOpacity={0.45}
+        >
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="hero-glow bg-[#3DDC84] top-1/3 left-1/4" />
+            <div className="hero-glow bg-[#D4A017] bottom-1/3 right-1/4" style={{ animationDelay: "3s" }} />
           </div>
 
-          <div className="relative p-8">
-            <div className="flex items-start justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-5">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-ryzen-500/20 to-red-600/20 border-2 border-ryzen-500/30 ryzen-glow-sm animate-float">
-                  <Zap size={32} className="text-ryzen-400" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-white">
-                    Welcome back{user ? `, ${user.username}` : ""}
-                    <span className="inline-block ml-2 animate-block-bounce">⛏️</span>
-                  </h1>
-                  <p className="text-sm text-slate-400 mt-1 flex items-center gap-3">
-                    <span className="flex items-center gap-1.5">
-                      <span className="h-2 w-2 rounded-full bg-ryzen-400 animate-pulse-glow" />
-                      <span className="rarity-uncommon font-medium">All systems nominal</span>
-                    </span>
-                    <span className="text-slate-700">|</span>
-                    <span className="flex items-center gap-1">
-                      <span>🟢</span>
-                      {overview.summary.activeServers} server{overview.summary.activeServers !== 1 ? "s" : ""} running
-                    </span>
-                  </p>
-                </div>
+          <div className="relative z-10 flex flex-col items-center justify-center h-full px-6 text-center">
+            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }} className="mb-6">
+              <div className="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(61,220,132,0.1)] border border-[rgba(61,220,132,0.2)]">
+                <Leaf size={14} className="text-[#3DDC84] animate-sway" />
+                <span className="text-xs font-medium text-[#3DDC84]">Premium Minecraft Hosting</span>
               </div>
-              <Link href="/create-server" className="btn-primary group">
-                <Plus size={16} />
-                <span>Create Server</span>
-                <ArrowRight size={14} className="opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </motion.div>
+            </motion.div>
 
-      {/* Stat Cards */}
-      <motion.div variants={item} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, i) => {
-          const Icon = stat.icon;
-          return (
-            <div key={stat.label}
-              className="relative overflow-hidden rounded-2xl border border-slate-700/30 bg-gradient-to-b from-slate-900/80 to-slate-900/40 p-5 hover:border-slate-600/50 hover:shadow-lg transition-all duration-300 group"
-              style={{ animationDelay: `${i * 0.1}s` }}
+            <motion.img
+              initial={{ opacity: 0, scale: 0.5, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              src="/zungle-logo.svg" alt="ZungleVibe" className="w-32 h-32 md:w-40 md:h-40 mb-6 animate-float"
+            />
+
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }}
+              className="text-5xl md:text-7xl lg:text-8xl font-black mb-6"
             >
-              <div className={`absolute -top-6 -right-6 w-20 h-20 rounded-full ${stat.bg} blur-xl group-hover:scale-150 transition-transform duration-500`} />
-              <div className="relative">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-500 flex items-center gap-1">
-                      <span>{stat.emoji}</span> {stat.label}
-                    </p>
-                    <p className="mt-2 text-3xl font-bold text-white font-mono tracking-tight">
-                      {stat.value}
-                    </p>
-                    <p className="text-[10px] text-slate-600 mt-1">{stat.desc}</p>
-                  </div>
-                  <div className={`rounded-xl ${stat.bg} ${stat.border} border p-3 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300`}>
-                    <Icon size={22} className="text-white/80" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </motion.div>
+              <span className="gradient-text">{panelName}</span>
+            </motion.h1>
 
-      {/* Main Content Grid */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Your Servers */}
-        <motion.div variants={item} className="lg:col-span-2">
-          <div className="rounded-2xl border border-slate-700/30 bg-gradient-to-b from-slate-900/80 to-slate-900/40 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="mc-block mc-block-diamond">
-                  <Diamond size={18} className="text-white" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-semibold text-white">Your Servers</h2>
-                  <p className="text-xs text-slate-500">Recently active servers</p>
-                </div>
-              </div>
-              <Link href="/my-servers" className="text-xs font-medium text-ryzen-400 hover:text-ryzen-300 flex items-center gap-1 transition-colors">
-                View all <ArrowRight size={12} />
-              </Link>
-            </div>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.25 }}
+              className="text-lg md:text-xl text-[rgba(245,247,245,0.6)] max-w-2xl mb-10"
+            >
+              The ultimate Minecraft server hosting experience. Deploy, manage, and scale your servers in the heart of the jungle.
+            </motion.p>
 
-            {servers.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="mb-5 relative">
-                  <div className="w-20 h-20 flex items-center justify-center rounded-2xl bg-slate-800/50 border border-slate-700/30">
-                    <Pickaxe size={36} className="text-slate-600" />
-                  </div>
-                  <span className="absolute -top-2 -right-2 text-lg animate-float">⛏️</span>
-                </div>
-                <p className="text-base font-semibold text-slate-300">No servers yet</p>
-                <p className="text-sm text-slate-500 mt-1">Deploy your first Minecraft server</p>
-                <Link href="/create-server" className="btn-primary mt-6">
-                  <Plus size={16} /> Create Server
+            <motion.div
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.35 }}
+              className="flex flex-col sm:flex-row gap-4"
+            >
+              {user ? (
+                <Link href="/create-server" className="btn-primary text-lg px-8 py-4">
+                  <Zap size={20} /> Deploy Server
                 </Link>
+              ) : (
+                <Link href="/auth/register" className="btn-primary text-lg px-8 py-4">
+                  <Zap size={20} /> Get Started Free
+                </Link>
+              )}
+              <a href="#plans" className="btn-secondary text-lg px-8 py-4">
+                View Plans <ArrowRight size={18} />
+              </a>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.8 }}
+              className="absolute bottom-8 scroll-indicator"
+            >
+              <ChevronDown size={28} className="text-[rgba(61,220,132,0.4)]" />
+            </motion.div>
+          </div>
+        </JungleVideoBackground>
+      </section>
+
+      {/* ═══ STATS ═══ */}
+      <section className="relative z-10 -mt-20 px-6">
+        <motion.div variants={c} initial="hidden" whileInView="show" viewport={{ once: true }} className="max-w-6xl mx-auto">
+          <motion.div variants={it} className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {stats.map(s => (
+              <div key={s.label} className="card-jungle text-center py-6 feature-card">
+                <s.icon size={24} className="text-[#3DDC84] mx-auto mb-3" />
+                <p className="text-3xl font-black text-[#F5F7F5] animate-counter-glow">{s.value}</p>
+                <p className="text-xs text-[rgba(245,247,245,0.5)] mt-1">{s.label}</p>
               </div>
-            ) : (
-              <div className="space-y-2">
-                {servers.slice(0, 5).map((s, i) => (
-                  <Link key={s.id} href={`/server/${s.id}`}
-                    className="flex items-center justify-between rounded-xl bg-slate-800/20 px-4 py-3.5 hover:bg-slate-800/40 hover:border hover:border-slate-700/30 transition-all group"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`mc-block ${s.status === "online" ? "mc-block-grass" : "mc-block-stone"} w-9 h-9`}>
-                        <span className="text-white text-sm font-bold relative z-10">{s.name.charAt(0).toUpperCase()}</span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-white group-hover:text-ryzen-400 transition-colors">{s.name}</p>
-                        <div className="flex items-center gap-2 text-[10px] text-slate-500 mt-0.5">
-                          <span className={`flex items-center gap-1 ${s.status === "online" ? "text-emerald-400" : "text-slate-500"}`}>
-                            <span className={`h-1.5 w-1.5 rounded-full ${s.status === "online" ? "bg-emerald-400" : "bg-slate-600"}`} />
-                            {s.status}
-                          </span>
-                          <span>•</span>
-                          <span>{s.node}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="hidden sm:flex items-center gap-2 text-[11px] text-slate-500">
-                        <span className="flex items-center gap-1 bg-slate-800/40 px-2 py-0.5 rounded-md"><Cpu size={10} /> {s.cpu}%</span>
-                        <span className="flex items-center gap-1 bg-slate-800/40 px-2 py-0.5 rounded-md"><MemoryStick size={10} /> {s.ram >= 1024 ? `${(s.ram / 1024).toFixed(1)}G` : `${s.ram}M`}</span>
-                        <span className="flex items-center gap-1 bg-slate-800/40 px-2 py-0.5 rounded-md"><HardDrive size={10} /> {s.disk >= 1024 ? `${(s.disk / 1024).toFixed(1)}G` : `${s.disk}M`}</span>
-                      </div>
-                      <ArrowRight size={14} className="text-slate-600 group-hover:text-ryzen-400 group-hover:translate-x-1 transition-all" />
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
+            ))}
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ═══ FEATURES ═══ */}
+      <section className="py-24 px-6" id="features">
+        <motion.div variants={c} initial="hidden" whileInView="show" viewport={{ once: true }} className="max-w-6xl mx-auto">
+          <motion.div variants={it} className="text-center mb-16">
+            <h2 className="section-title">Why <span className="gradient-text">ZungleVibe</span>?</h2>
+            <p className="section-subtitle">Our jungle infrastructure is built for one thing: absolute performance.</p>
+          </motion.div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((f, i) => (
+              <motion.div key={f.title} variants={it} className="card-jungle feature-card">
+                <div className={`feature-icon inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br ${f.color} mb-4`}>
+                  <f.icon size={24} className="text-white" />
+                </div>
+                <h3 className="text-lg font-bold text-[#F5F7F5] mb-2">{f.title}</h3>
+                <p className="text-sm text-[rgba(245,247,245,0.5)] leading-relaxed">{f.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
+      </section>
 
-        {/* Activity Feed */}
-        <motion.div variants={item}>
-          <div className="rounded-2xl border border-slate-700/30 bg-gradient-to-b from-slate-900/80 to-slate-900/40 p-6 h-full">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="mc-block mc-block-gold">
-                <Sparkles size={18} className="text-white" />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold text-white">Activity</h2>
-                <p className="text-xs text-slate-500">Recent actions</p>
+      {/* ═══ PRICING ═══ */}
+      <section id="plans" className="py-24 px-6">
+        <motion.div variants={c} initial="hidden" whileInView="show" viewport={{ once: true }} className="max-w-6xl mx-auto">
+          <motion.div variants={it} className="text-center mb-16">
+            <h2 className="section-title">Choose Your <span className="gradient-text-gold">Biome</span></h2>
+            <p className="section-subtitle">From solo adventures to massive networks — we have the perfect plan.</p>
+          </motion.div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {plans.map((plan, i) => (
+              <motion.div key={plan.name} variants={it}
+                className={`rounded-2xl p-6 transition-all duration-300 feature-card ${
+                  plan.popular
+                    ? "glass-gold border-[rgba(212,160,23,0.3)] scale-[1.02]"
+                    : "card-jungle"
+                }`}
+              >
+                {plan.popular && (
+                  <div className="badge-gold mb-4">
+                    <Crown size={12} /> Most Popular
+                  </div>
+                )}
+                <h3 className="text-xl font-bold text-[#F5F7F5] mb-1">{plan.name}</h3>
+                <div className="flex items-baseline gap-1 mb-4">
+                  <span className="text-3xl font-black text-[#3DDC84]">{plan.price}</span>
+                  {plan.period && <span className="text-sm text-[rgba(245,247,245,0.4)]">{plan.period}</span>}
+                </div>
+                <div className="space-y-2 mb-6 text-sm">
+                  <div className="flex items-center gap-2 text-[rgba(245,247,245,0.6)]">
+                    <MemoryStick size={14} className="text-[#3DDC84]" /> {plan.ram} RAM
+                  </div>
+                  <div className="flex items-center gap-2 text-[rgba(245,247,245,0.6)]">
+                    <Cpu size={14} className="text-[#3DDC84]" /> {plan.cpu} CPU
+                  </div>
+                  <div className="flex items-center gap-2 text-[rgba(245,247,245,0.6)]">
+                    <HardDrive size={14} className="text-[#3DDC84]" /> {plan.disk} Disk
+                  </div>
+                </div>
+                <ul className="space-y-2 mb-6">
+                  {plan.features.map(f => (
+                    <li key={f} className="flex items-center gap-2 text-xs text-[rgba(245,247,245,0.5)]">
+                      <Check size={12} className="text-[#3DDC84] flex-shrink-0" /> {f}
+                    </li>
+                  ))}
+                </ul>
+                {plan.popular ? (
+                  <Link href="/create-server" className="btn-gold w-full text-center">Get Started</Link>
+                ) : (
+                  <Link href="/create-server" className="btn-primary w-full text-center">Get Started</Link>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </section>
+
+      {/* ═══ REVIEWS ═══ */}
+      <section className="py-24 px-6">
+        <motion.div variants={c} initial="hidden" whileInView="show" viewport={{ once: true }} className="max-w-6xl mx-auto">
+          <motion.div variants={it} className="text-center mb-16">
+            <h2 className="section-title">From the <span className="gradient-text">Jungle</span></h2>
+            <p className="section-subtitle">Hear from server owners who made the switch.</p>
+          </motion.div>
+          <div className="grid md:grid-cols-2 gap-6">
+            {reviews.map((r, i) => (
+              <motion.div key={r.name} variants={it} className="card-jungle">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#3DDC84]/30 to-[#1FA855]/30 flex items-center justify-center text-sm font-bold text-[#3DDC84]">
+                    {r.avatar}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-[#F5F7F5]">{r.name}</p>
+                    <p className="text-[10px] text-[rgba(245,247,245,0.4)]">{r.role} &bull; {r.server}</p>
+                  </div>
+                  <div className="ml-auto flex gap-0.5">
+                    {Array.from({ length: r.rating }).map((_, j) => (
+                      <Star key={j} size={12} className="text-[#D4A017] fill-[#D4A017]" />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-sm text-[rgba(245,247,245,0.6)] leading-relaxed">{r.text}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </section>
+
+      {/* ═══ LOCATIONS ═══ */}
+      <section className="py-24 px-6">
+        <motion.div variants={c} initial="hidden" whileInView="show" viewport={{ once: true }} className="max-w-6xl mx-auto">
+          <motion.div variants={it} className="text-center mb-16">
+            <h2 className="section-title">Global <span className="gradient-text">Jungle Network</span></h2>
+            <p className="section-subtitle">Servers across 6 continents for maximum performance.</p>
+          </motion.div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {locations.map(loc => (
+              <motion.div key={loc.city} variants={it} className="card-jungle flex items-center gap-4">
+                <span className="text-3xl">{loc.flag}</span>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-[#F5F7F5]">{loc.city}, {loc.country}</p>
+                  <div className="flex items-center gap-3 text-[10px] text-[rgba(245,247,245,0.4)] mt-1">
+                    <span className="flex items-center gap-1"><Wifi size={10} className="text-[#3DDC84]" /> {loc.ping}</span>
+                    <span className="flex items-center gap-1"><Server size={10} /> {loc.servers} servers</span>
+                  </div>
+                </div>
+                <MapPin size={16} className="text-[rgba(245,247,245,0.2)]" />
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </section>
+
+      {/* ═══ FAQ ═══ */}
+      <section className="py-24 px-6">
+        <motion.div variants={c} initial="hidden" whileInView="show" viewport={{ once: true }} className="max-w-3xl mx-auto">
+          <motion.div variants={it} className="text-center mb-16">
+            <h2 className="section-title">Frequently <span className="gradient-text">Asked</span></h2>
+          </motion.div>
+          <div className="space-y-3">
+            {faqs.map((faq, i) => (
+              <motion.div key={i} variants={it} className="card-jungle">
+                <button onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="flex items-center justify-between w-full text-left"
+                >
+                  <span className="text-sm font-semibold text-[#F5F7F5]">{faq.q}</span>
+                  <ChevronDown size={16} className={`text-[#3DDC84] transition-transform ${openFaq === i ? "rotate-180" : ""}`} />
+                </button>
+                <AnimatePresence>
+                  {openFaq === i && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <p className="text-sm text-[rgba(245,247,245,0.5)] mt-3 leading-relaxed">{faq.a}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </section>
+
+      {/* ═══ DISCORD ═══ */}
+      <section className="py-24 px-6">
+        <motion.div variants={c} initial="hidden" whileInView="show" viewport={{ once: true }} className="max-w-4xl mx-auto text-center">
+          <motion.div variants={it}>
+            <div className="card-jungle p-12 relative overflow-hidden">
+              <div className="absolute -top-20 -right-20 w-64 h-64 bg-[rgba(61,220,132,0.08)] rounded-full blur-3xl" />
+              <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-[rgba(212,160,23,0.05)] rounded-full blur-3xl" />
+              <div className="relative">
+                <MessageSquare size={48} className="text-[#3DDC84] mx-auto mb-6 animate-float" />
+                <h2 className="text-3xl md:text-4xl font-black text-[#F5F7F5] mb-4">Join the <span className="gradient-text">Jungle</span></h2>
+                <p className="text-[rgba(245,247,245,0.5)] mb-8 max-w-xl mx-auto">
+                  Connect with 10,000+ server owners, get instant support, and stay updated on the latest features.
+                </p>
+                <a href="https://discord.gg/zanglevibe" target="_blank" rel="noopener noreferrer"
+                  className="btn-primary text-lg px-8 py-4 inline-flex items-center gap-2"
+                >
+                  <MessageSquare size={20} /> Join Discord
+                </a>
               </div>
             </div>
+          </motion.div>
+        </motion.div>
+      </section>
 
-            {activity.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="w-16 h-16 flex items-center justify-center rounded-2xl bg-slate-800/30 mb-3">
-                  <Activity size={28} className="text-slate-700" />
+      {/* ═══ CTA ═══ */}
+      <section className="py-24 px-6">
+        <motion.div variants={c} initial="hidden" whileInView="show" viewport={{ once: true }} className="max-w-4xl mx-auto text-center">
+          <motion.div variants={it}>
+            <div className="glass-jungle rounded-3xl p-12 relative overflow-hidden">
+              <div className="absolute -top-20 -right-20 w-64 h-64 bg-[rgba(61,220,132,0.1)] rounded-full blur-3xl" />
+              <div className="relative">
+                <h2 className="text-3xl md:text-4xl font-black text-[#F5F7F5] mb-4">Ready to Enter the <span className="gradient-text">Jungle</span>?</h2>
+                <p className="text-[rgba(245,247,245,0.5)] mb-8 max-w-xl mx-auto">
+                  Deploy your Minecraft server in seconds. No credit card required for the free plan.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  {user ? (
+                    <Link href="/create-server" className="btn-primary text-lg px-8 py-4">
+                      <Plus size={20} /> Create Server
+                    </Link>
+                  ) : (
+                    <Link href="/auth/register" className="btn-primary text-lg px-8 py-4">
+                      <Zap size={20} /> Get Started Free
+                    </Link>
+                  )}
                 </div>
-                <p className="text-sm text-slate-400">No activity yet</p>
-                <p className="text-[11px] text-slate-600 mt-1">Actions will appear here</p>
               </div>
-            ) : (
-              <div className="space-y-1">
-                {activity.slice(0, 10).map((a, i) => (
-                  <div key={a.id}
-                    className="flex items-start gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-800/20 transition-colors"
-                  >
-                    <div className={`mt-1.5 h-2.5 w-2.5 rounded-full flex-shrink-0 ${
-                      a.status === "SUCCESS" ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.3)]" :
-                      a.status === "WARNING" ? "bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.3)]" :
-                      "bg-red-400 shadow-[0_0_8px_rgba(248,113,113,0.3)]"
-                    }`} />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-slate-300 truncate">{a.title}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <p className="text-[10px] text-slate-600">{new Date(a.time).toLocaleDateString()}</p>
-                        {a.serverName && (
-                          <>
-                            <span className="text-slate-700">•</span>
-                            <span className="text-[10px] text-slate-600 truncate">{a.serverName}</span>
-                          </>
-                        )}
+            </div>
+          </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ═══ DASHBOARD PREVIEW (logged-in users) ═══ */}
+      {user && servers && servers.length > 0 && (
+        <section className="py-16 px-6">
+          <motion.div variants={c} initial="hidden" whileInView="show" viewport={{ once: true }} className="max-w-6xl mx-auto">
+            <motion.div variants={it} className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold text-[#F5F7F5]">Your Servers</h2>
+              <Link href="/my-servers" className="btn-ghost">View All <ArrowRight size={14} /></Link>
+            </motion.div>
+            <div className="space-y-3">
+              {servers.slice(0, 3).map((s: any) => (
+                <Link key={s.id} href={`/server/${s.id}`}
+                  className="card-jungle flex items-center justify-between feature-card"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold text-white ${
+                      s.status === "online" ? "bg-[rgba(61,220,132,0.2)] text-[#3DDC84]" : "bg-[rgba(245,247,245,0.05)] text-[rgba(245,247,245,0.3)]"
+                    }`}>
+                      {s.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-[#F5F7F5]">{s.name}</p>
+                      <div className="flex items-center gap-2 text-[10px] text-[rgba(245,247,245,0.4)]">
+                        <span className={`flex items-center gap-1 ${s.status === "online" ? "text-[#3DDC84]" : ""}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${s.status === "online" ? "bg-[#3DDC84]" : "bg-[rgba(245,247,245,0.2)]"}`} />
+                          {s.status}
+                        </span>
+                        <span>&bull;</span><span>{s.node}</span>
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Quick Stats Bar */}
-      <motion.div variants={item}>
-        <div className="rounded-2xl border border-slate-700/30 bg-gradient-to-b from-slate-900/60 to-slate-900/20 p-4">
-          <div className="flex items-center justify-center gap-6 sm:gap-10 text-xs text-slate-500 flex-wrap">
-            <span className="flex items-center gap-1.5"><Zap size={12} className="text-ryzen-400" /> Powered by <strong className="text-ryzen-400">RYZENPANEL</strong></span>
-            <span className="flex items-center gap-1.5"><Sword size={12} className="text-slate-600" /> {overview.summary.totalServers} servers deployed</span>
-            <span className="flex items-center gap-1.5"><Users size={12} className="text-slate-600" /> {overview.summary.activeServers} players online</span>
-            <span className="flex items-center gap-1.5"><Pickaxe size={12} className="text-slate-600" /> {overview.summary.userServers} your servers</span>
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
+                  <ArrowRight size={16} className="text-[rgba(245,247,245,0.2)]" />
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        </section>
+      )}
+    </div>
   );
 }

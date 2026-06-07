@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="emerald" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3DDC84"/>
+      <stop offset="100%" stop-color="#1FA855"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4A017"/>
+      <stop offset="100%" stop-color="#B8860B"/>
+    </linearGradient>
+    <linearGradient id="bark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3D2B1F"/>
+      <stop offset="100%" stop-color="#2A1B10"/>
+    </linearGradient>
+    <linearGradient id="leaf1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2E8B57"/>
+      <stop offset="100%" stop-color="#1B5E3B"/>
+    </linearGradient>
+    <linearGradient id="leaf2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3DDC84"/>
+      <stop offset="100%" stop-color="#28A745"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="emerald-glow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="#0B0F0C" stroke="url(#emerald)" stroke-width="4" opacity="0.9"/>
+
+  <!-- Ancient temple base (blocky MC style) -->
+  <rect x="168" y="380" width="176" height="16" rx="2" fill="#4A3728" opacity="0.8"/>
+  <rect x="176" y="364" width="160" height="16" rx="2" fill="#5C4033" opacity="0.7"/>
+  <rect x="184" y="348" width="144" height="16" rx="2" fill="#4A3728" opacity="0.6"/>
+  <!-- Temple pillars -->
+  <rect x="192" y="300" width="12" height="48" rx="2" fill="#5C4033"/>
+  <rect x="308" y="300" width="12" height="48" rx="2" fill="#5C4033"/>
+  <!-- Temple arch -->
+  <rect x="192" y="296" width="128" height="8" rx="2" fill="#6B4E37"/>
+  <!-- Temple doorway -->
+  <rect x="232" y="310" width="48" height="38" rx="2" fill="#1A0F0A"/>
+
+  <!-- Main tree trunk (blocky) -->
+  <rect x="232" y="140" width="48" height="210" rx="4" fill="url(#bark)"/>
+  <!-- Bark texture lines -->
+  <rect x="240" y="160" width="4" height="30" rx="1" fill="#1A0F0A" opacity="0.3"/>
+  <rect x="260" y="180" width="4" height="40" rx="1" fill="#1A0F0A" opacity="0.3"/>
+  <rect x="244" y="220" width="4" height="35" rx="1" fill="#1A0F0A" opacity="0.3"/>
+  <rect x="264" y="260" width="4" height="25" rx="1" fill="#1A0F0A" opacity="0.3"/>
+
+  <!-- Root system -->
+  <rect x="200" y="350" width="32" height="12" rx="3" fill="#3D2B1F" transform="rotate(-15 200 350)"/>
+  <rect x="280" y="350" width="32" height="12" rx="3" fill="#3D2B1F" transform="rotate(15 296 350)"/>
+  <rect x="190" y="360" width="24" height="10" rx="3" fill="#2A1B10" transform="rotate(-25 190 360)"/>
+  <rect x="298" y="360" width="24" height="10" rx="3" fill="#2A1B10" transform="rotate(25 310 360)"/>
+
+  <!-- Canopy layers (blocky leaves) -->
+  <rect x="160" y="100" width="192" height="20" rx="8" fill="url(#leaf1)" opacity="0.9"/>
+  <rect x="140" y="116" width="232" height="20" rx="8" fill="url(#leaf2)" opacity="0.85"/>
+  <rect x="120" y="132" width="272" height="24" rx="10" fill="url(#leaf1)" opacity="0.8"/>
+  <rect x="140" y="152" width="232" height="20" rx="8" fill="url(#leaf2)" opacity="0.75"/>
+
+  <!-- Hanging vines -->
+  <rect x="170" y="120" width="3" height="60" rx="1" fill="#2E8B57" opacity="0.6" transform="rotate(-3 170 120)"/>
+  <rect x="200" y="110" width="3" height="80" rx="1" fill="#3DDC84" opacity="0.5" transform="rotate(2 200 110)"/>
+  <rect x="310" y="115" width="3" height="70" rx="1" fill="#2E8B57" opacity="0.6" transform="rotate(3 310 115)"/>
+  <rect x="340" y="120" width="3" height="55" rx="1" fill="#3DDC84" opacity="0.5" transform="rotate(-2 340 120)"/>
+
+  <!-- Bamboo stalks -->
+  <rect x="140" y="180" width="8" height="170" rx="2" fill="#6B8E23" opacity="0.7"/>
+  <rect x="140" y="210" width="10" height="4" rx="1" fill="#556B2F" opacity="0.8"/>
+  <rect x="140" y="250" width="10" height="4" rx="1" fill="#556B2F" opacity="0.8"/>
+  <rect x="140" y="290" width="10" height="4" rx="1" fill="#556B2F" opacity="0.8"/>
+  <rect x="364" y="170" width="8" height="180" rx="2" fill="#6B8E23" opacity="0.7"/>
+  <rect x="364" y="200" width="10" height="4" rx="1" fill="#556B2F" opacity="0.8"/>
+  <rect x="364" y="240" width="10" height="4" rx="1" fill="#556B2F" opacity="0.8"/>
+  <rect x="364" y="280" width="10" height="4" rx="1" fill="#556B2F" opacity="0.8"/>
+
+  <!-- Emerald gemstone in temple -->
+  <g filter="url(#emerald-glow)">
+    <polygon points="256,315 264,325 256,335 248,325" fill="url(#emerald)" opacity="0.9"/>
+    <polygon points="256,318 261,325 256,332 251,325" fill="#7CFC00" opacity="0.7"/>
+  </g>
+
+  <!-- Fireflies -->
+  <circle cx="155" cy="190" r="3" fill="#3DDC84" filter="url(#glow)" opacity="0.8"/>
+  <circle cx="350" cy="200" r="2.5" fill="#D4A017" filter="url(#glow)" opacity="0.7"/>
+  <circle cx="180" cy="250" r="2" fill="#3DDC84" filter="url(#glow)" opacity="0.6"/>
+  <circle cx="330" cy="260" r="2.5" fill="#D4A017" filter="url(#glow)" opacity="0.7"/>
+  <circle cx="210" cy="170" r="2" fill="#3DDC84" filter="url(#glow)" opacity="0.5"/>
+  <circle cx="300" cy="180" r="3" fill="#3DDC84" filter="url(#glow)" opacity="0.6"/>
+
+  <!-- Small waterfall -->
+  <rect x="355" y="300" width="6" height="50" rx="2" fill="#4FC3F7" opacity="0.4"/>
+  <rect x="357" y="305" width="3" height="40" rx="1" fill="#81D4FA" opacity="0.3"/>
+
+  <!-- Text: ZungleVibe -->
+  <text x="256" y="430" text-anchor="middle" font-family="Arial Black, sans-serif" font-weight="900" font-size="36" fill="url(#emerald)" filter="url(#glow)">ZungleVibe</text>
+  <text x="256" y="458" text-anchor="middle" font-family="Arial, sans-serif" font-weight="400" font-size="14" fill="#D4A017" letter-spacing="8">HOSTING</text>
+</svg>

@@ -60,8 +60,8 @@ async function registerWithPanel() {
   const cfgPath = path.join(cfgDir, "daemon.json");
 
   try {
-    const daemonFqdn = process.env.DAEMON_FQDN || host;
-    const daemonIp = process.env.DAEMON_IP || daemonFqdn;
+    const daemonFqdn = (process.env.DAEMON_FQDN || host).replace(/\/+$/, "");
+    const daemonIp = (process.env.DAEMON_IP || daemonFqdn).replace(/\/+$/, "");
     const res = await fetch(`${panelUrl}/api/nodes/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

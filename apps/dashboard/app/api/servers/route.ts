@@ -44,10 +44,9 @@ function getEnvForServer(server: any, software: string, version: string): string
 async function createContainerOnDaemon(node: any, server: any, software: string, version: string) {
   let daemonUrl: string;
   if (node.fqdn?.startsWith("http")) {
-    daemonUrl = node.fqdn;
+    daemonUrl = node.fqdn.replace(/\/+$/, "");
     const parsed = new URL(daemonUrl);
-    const portInUrl = parsed.port || (parsed.protocol === "https:" ? "443" : "80");
-    if (node.daemonPort && portInUrl !== String(node.daemonPort)) {
+    if (node.daemonPort && parsed.port && parsed.port !== String(node.daemonPort)) {
       daemonUrl = `${parsed.protocol}//${parsed.hostname}:${node.daemonPort}`;
     }
   } else {

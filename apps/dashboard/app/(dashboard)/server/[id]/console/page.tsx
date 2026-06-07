@@ -17,6 +17,7 @@ export default function ConsolePage() {
   const [nodeIp, setNodeIp] = useState<string | null>(null);
   const [nodeFqdn, setNodeFqdn] = useState<string | null>(null);
   const [nodeDaemonKey, setNodeDaemonKey] = useState<string | null>(null);
+  const [nodeDaemonPort, setNodeDaemonPort] = useState<number>(8080);
   const wsRef = useRef<WebSocket | null>(null);
   const logsEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -29,6 +30,7 @@ export default function ConsolePage() {
         if (d.node?.ip) setNodeIp(d.node.ip);
         if (d.node?.fqdn) setNodeFqdn(d.node.fqdn);
         if (d.node?.daemonKey) setNodeDaemonKey(d.node.daemonKey);
+        if (d.node?.daemonPort) setNodeDaemonPort(d.node.daemonPort);
       }
     });
   }, [params.id]);
@@ -38,10 +40,30 @@ export default function ConsolePage() {
   }, [logs, autoScroll]);
 
   useEffect(() => {
-    if (!nodeIp) return;
+    if (!nodeIp && !nodeFqdn) return;
     let reconnectTimer: ReturnType<typeof setTimeout>;
     let reconnectAttempts = 0;
     const MAX_RECONNECT = 10;
+
+    function buildWsUrl(): string {
+      let protocol = "ws:";
+      let host: string;
+
+      if (nodeFqdn?.startsWith("https://")) {
+        protocol = "wss:";
+        host = nodeFqdn.replace(/^https?:\/\//, "").replace(/\/+$/, "");
+      } else if (nodeFqdn?.startsWith("http://")) {
+        host = nodeFqdn.replace(/^https?:\/\//, "").replace(/\/+$/, "");
+      } else if (nodeFqdn) {
+        host = nodeFqdn.replace(/\/+$/, "");
+      } else {
+        host = `${nodeIp}:${nodeDaemonPort || 8080}`;
+      }
+      const token = nodeDaemonKey || "daemon";
+      const wsContainerId = containerId;
+      if (!wsContainerId) return "";
+      return `${protocol}//${host}/ws/console?token=${token}&containerId=${wsContainerId}`;
+    }
 
     function connect() {
       if (reconnectAttempts >= MAX_RECONNECT) {
@@ -49,19 +71,11 @@ export default function ConsolePage() {
         return;
       }
       reconnectAttempts++;
-
-      let protocol = "ws:";
-      let daemonHost = process.env.NEXT_PUBLIC_DAEMON_HOST || `${nodeIp}:8080`;
-      if (nodeFqdn?.startsWith("https://")) {
-        protocol = "wss:";
-        daemonHost = nodeFqdn.replace(/^https?:\/\//, "");
-      } else if (nodeFqdn?.startsWith("http://")) {
-        daemonHost = nodeFqdn.replace(/^https?:\/\//, "");
+      const wsUrl = buildWsUrl();
+      if (!wsUrl) {
+        setLogs(prev => [...prev, "[INFO] [RYZENPANEL] Server has no container yet. Start the server to access console."]);
+        return;
       }
-      const token = process.env.NEXT_PUBLIC_DAEMON_KEY || nodeDaemonKey || "daemon";
-      const wsContainerId = containerId || params.id;
-      const wsUrl = `${protocol}//${daemonHost}/ws/console?token=${token}&containerId=${wsContainerId}`;
-
       const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
@@ -76,12 +90,11 @@ export default function ConsolePage() {
           if (msg.type === "output") {
             setLogs(prev => [...prev, msg.data]);
           } else if (msg.error) {
-            setLogs(prev => [...prev, `[ERROR] ${msg.error}`]);
-            if (msg.error.includes("no such container") || msg.error.includes("No such container")) {
-              setLogs(prev => [...prev, "[WARN] [RYZENPANEL] Container not found. Waiting for server to start..."]);
-              reconnectAttempts = MAX_RECONNECT;
+            if (msg.error.includes("no such container") || msg.error.includes("No such container") || msg.error.includes("NotFound")) {
+              setLogs(prev => [...prev, "[INFO] [RYZENPANEL] Container not found. Waiting for server to start..."]);
               return;
             }
+            setLogs(prev => [...prev, `[ERROR] ${msg.error}`]);
           }
         } catch {
           setLogs(prev => [...prev, event.data]);
@@ -91,7 +104,6 @@ export default function ConsolePage() {
       ws.onclose = () => {
         setConnected(false);
         if (reconnectAttempts < MAX_RECONNECT) {
-          setLogs(prev => [...prev, "[WARN] [RYZENPANEL] Disconnected from daemon. Reconnecting..."]);
           reconnectTimer = setTimeout(connect, 5000);
         }
       };
@@ -102,7 +114,7 @@ export default function ConsolePage() {
 
     connect();
     return () => { clearTimeout(reconnectTimer); wsRef.current?.close(); };
-  }, [params.id, nodeIp, nodeFqdn, nodeDaemonKey, containerId]);
+  }, [params.id, nodeIp, nodeFqdn, nodeDaemonKey, nodeDaemonPort, containerId]);
 
   const handleSend = useCallback(() => {
     if (!input.trim() || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;

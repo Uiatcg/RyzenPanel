@@ -10,13 +10,26 @@ function getDefaultSettings() {
     panelName: "RYZENPANEL",
     logoUrl: "/favicon.svg",
     primaryColor: "#ef4444",
+    heroImageUrl: "",
+    heroVideoUrl: "",
+    bannerUrl: "",
+    tagline: "The ultimate Minecraft server hosting experience. Deploy, manage, and scale your servers with ease.",
+    creditsEnabled: true,
+    freeServersEnabled: true,
+    adRewardCredits: 10,
+    dailyRewardCredits: 5,
+    communityEnabled: true,
+    audioEnabled: false,
+    audioUrl: "",
+    announcementsEnabled: true,
+    ticketsEnabled: true,
   };
 }
 
 function readSettings() {
   try {
     if (fs.existsSync(SETTINGS_PATH)) {
-      return JSON.parse(fs.readFileSync(SETTINGS_PATH, "utf8"));
+      return { ...getDefaultSettings(), ...JSON.parse(fs.readFileSync(SETTINGS_PATH, "utf8")) };
     }
   } catch {}
   return getDefaultSettings();
@@ -34,11 +47,8 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const settings = {
-      panelName: body.panelName || "RYZENPANEL",
-      logoUrl: body.logoUrl || "/favicon.svg",
-      primaryColor: body.primaryColor || "#ef4444",
-    };
+    const current = readSettings();
+    const settings = { ...current, ...body };
     fs.writeFileSync(SETTINGS_PATH, JSON.stringify(settings, null, 2));
     return NextResponse.json({ success: true, settings });
   } catch (err) {

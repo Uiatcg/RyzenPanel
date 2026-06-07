@@ -1,12 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#34d399"/>
-      <stop offset="100%" stop-color="#059669"/>
+    <linearGradient id="fg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3DDC84"/>
+      <stop offset="100%" stop-color="#1FA855"/>
     </linearGradient>
+    <filter id="fg-glow">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
-  <rect width="64" height="64" rx="14" fill="#0f172a"/>
-  <rect x="2" y="2" width="60" height="60" rx="12" fill="none" stroke="url(#g)" stroke-width="1.5" opacity="0.4"/>
-  <path d="M18 18h12l8 14-8 14h-6l6-10H22V18z" fill="url(#g)"/>
-  <rect x="22" y="38" width="24" height="5" rx="2.5" fill="url(#g)"/>
+  <rect width="64" height="64" rx="14" fill="#0B0F0C"/>
+  <rect x="24" y="16" width="16" height="36" rx="2" fill="#3D2B1F"/>
+  <rect x="12" y="12" width="40" height="10" rx="5" fill="#2E8B57" opacity="0.9"/>
+  <rect x="8" y="18" width="48" height="10" rx="5" fill="#3DDC84" opacity="0.8"/>
+  <rect x="14" y="26" width="36" height="8" rx="4" fill="#2E8B57" opacity="0.7"/>
+  <rect x="20" y="46" width="24" height="6" rx="2" fill="#5C4033"/>
+  <polygon points="32,34 36,40 32,46 28,40" fill="url(#fg)" filter="url(#fg-glow)" opacity="0.9"/>
+  <circle cx="14" cy="22" r="2" fill="#3DDC84" filter="url(#fg-glow)" opacity="0.6"/>
+  <circle cx="50" cy="20" r="1.5" fill="#D4A017" filter="url(#fg-glow)" opacity="0.5"/>
 </svg>

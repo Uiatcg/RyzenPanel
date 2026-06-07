@@ -1,18 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Server, PlusCircle, ShoppingCart, Ticket,
   ChevronLeft, ChevronRight, Settings, Shield, Radio,
-  Zap, Diamond,
+  Zap, Diamond, Coins, Users,
 } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/my-servers", label: "My Servers", icon: Server },
   { href: "/create-server", label: "Create Server", icon: PlusCircle },
+  { href: "/credits", label: "Credits", icon: Coins },
+  { href: "/community", label: "Community", icon: Users },
   { href: "/wings", label: "RyzenDaemon", icon: Radio },
   { href: "/billing", label: "Billing", icon: ShoppingCart },
   { href: "/tickets", label: "Support", icon: Ticket },
@@ -23,6 +25,24 @@ const navItems = [
 export function Sidebar({ isAdmin }: { isAdmin?: boolean }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const [credits, setCredits] = useState<number | null>(null);
+  const [logoUrl, setLogoUrl] = useState<string>("/favicon.svg");
+  const [panelName, setPanelName] = useState<string>("RYZENPANEL");
+
+  useEffect(() => {
+    fetch("/api/credits?tab=overview")
+      .then(r => r.json())
+      .then(d => { if (d.credits !== undefined) setCredits(d.credits); })
+      .catch(() => {});
+
+    fetch("/api/admin/settings")
+      .then(r => r.json())
+      .then(d => {
+        if (d.logoUrl) setLogoUrl(d.logoUrl);
+        if (d.panelName) setPanelName(d.panelName);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <aside className={`relative flex flex-col border-r border-slate-800/50 bg-slate-900/40 backdrop-blur-xl transition-all duration-300 ${collapsed ? "w-16" : "w-64"}`}>
@@ -30,19 +50,27 @@ export function Sidebar({ isAdmin }: { isAdmin?: boolean }) {
       <div className="flex h-16 items-center justify-between border-b border-slate-800/50 px-4">
         {!collapsed ? (
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-ryzen-500 to-red-600 ryzen-glow-sm transition-all group-hover:scale-105 group-hover:rotate-3">
-              <Zap size={18} className="text-white" />
-            </div>
+            {logoUrl && logoUrl !== "/favicon.svg" ? (
+              <img src={logoUrl} alt={panelName} className="h-9 w-9 rounded-xl object-contain bg-slate-900/50 transition-all group-hover:scale-105" />
+            ) : (
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-ryzen-500 to-red-600 ryzen-glow-sm transition-all group-hover:scale-105 group-hover:rotate-3">
+                <Zap size={18} className="text-white" />
+              </div>
+            )}
             <div>
-              <div className="text-sm font-bold tracking-wide text-white">RYZENPANEL</div>
+              <div className="text-sm font-bold tracking-wide text-white">{panelName}</div>
               <div className="text-[8px] font-semibold mc-gradient-text tracking-[0.2em] uppercase">Minecraft Hosting</div>
             </div>
           </Link>
         ) : (
           <Link href="/" className="mx-auto group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-ryzen-500 to-red-600 ryzen-glow-sm transition-all group-hover:scale-105">
-              <Zap size={18} className="text-white" />
-            </div>
+            {logoUrl && logoUrl !== "/favicon.svg" ? (
+              <img src={logoUrl} alt={panelName} className="h-9 w-9 rounded-xl object-contain bg-slate-900/50" />
+            ) : (
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-ryzen-500 to-red-600 ryzen-glow-sm transition-all group-hover:scale-105">
+                <Zap size={18} className="text-white" />
+              </div>
+            )}
           </Link>
         )}
         <button onClick={() => setCollapsed(!collapsed)}
@@ -73,6 +101,17 @@ export function Sidebar({ isAdmin }: { isAdmin?: boolean }) {
           );
         })}
       </nav>
+
+      {/* Credits Badge */}
+      {credits !== null && !collapsed && (
+        <div className="border-t border-slate-800/50 px-3 py-3">
+          <Link href="/credits" className="flex items-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/10 px-3 py-2 hover:bg-amber-500/20 transition-colors">
+            <Coins size={14} className="text-amber-400" />
+            <span className="text-xs font-semibold text-amber-400">{credits.toLocaleString()}</span>
+            <span className="text-[10px] text-amber-400/60">credits</span>
+          </Link>
+        </div>
+      )}
 
       {/* Support card */}
       <div className="border-t border-slate-800/50 p-3">

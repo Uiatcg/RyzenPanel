@@ -9,6 +9,7 @@ datasource db {
 
 enum Role {
   USER
+  MODERATOR
   ADMIN
 }
 
@@ -77,6 +78,9 @@ model User {
   tickets        Ticket[]
   ticketMessages TicketMessage[]
   invoices       Invoice[]
+  creditTransactions  CreditTransaction[]
+  creditPurchases     CreditShopPurchase[]
+  chatMessages        ChatMessage[]
 
   @@index([email])
   @@index([username])
@@ -421,4 +425,92 @@ model Announcement {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  content   String
+  channel   String   @default("general")
+  createdAt DateTime @default(now())
+
+  @@index([channel, createdAt])
+  @@index([userId])
+}
+
+model Permission {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  name        String
+  description String?
+  rolePermissions RolePermission[]
+  createdAt   DateTime @default(now())
+}
+
+model RolePermission {
+  id           String     @id @default(uuid())
+  role         Role
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  permissionId String
+  allowed      Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+
+  @@unique([role, permissionId])
+}
+
+enum CreditTransactionType {
+  EARN_AD
+  EARN_DAILY
+  EARN_REFERRAL
+  EARN_ADMIN
+  EARN_SIGNUP
+  SPEND_RAM
+  SPEND_CPU
+  SPEND_DISK
+  SPEND_SERVER
+  SPEND_BACKUP
+  SPEND_DATABASE
+}
+
+model CreditTransaction {
+  id        String                @id @default(uuid())
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  type      CreditTransactionType
+  amount    Float
+  balance   Float
+  metadata  Json?
+  createdAt DateTime              @default(now())
+
+  @@index([userId])
+  @@index([userId, createdAt])
+}
+
+model CreditShopItem {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  category    String
+  cost        Int
+  ram         Int?     @default(0)
+  cpu         Int?     @default(0)
+  disk        Int?     @default(0)
+  backups     Int?     @default(0)
+  isActive    Boolean  @default(true)
+  purchases   CreditShopPurchase[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CreditShopPurchase {
+  id        String        @id @default(uuid())
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  item      CreditShopItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId    String
+  credits   Float
+  createdAt DateTime      @default(now())
+
+  @@index([userId])
 }

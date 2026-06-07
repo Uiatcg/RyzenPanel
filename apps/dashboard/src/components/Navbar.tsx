@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Bell, User, LogOut, Shield, Zap } from "lucide-react";
+import { Bell, User, LogOut, Shield, Leaf } from "lucide-react";
 import type { UserData } from "@/src/types/dashboard";
 
 export function Navbar() {
@@ -21,26 +21,26 @@ export function Navbar() {
   }
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-slate-800/50 bg-slate-900/30 backdrop-blur-xl px-6">
+    <header className="flex h-16 items-center justify-between border-b border-[rgba(61,220,132,0.08)] bg-[rgba(11,15,12,0.6)] backdrop-blur-xl px-6">
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 rounded-xl bg-slate-800/30 border border-slate-700/30 px-3 py-1.5">
-          <span className="h-2 w-2 rounded-full bg-ryzen-400 animate-pulse-glow" />
-          <span className="text-xs text-slate-400">⚡ All systems nominal</span>
+        <div className="flex items-center gap-2 rounded-xl bg-[rgba(61,220,132,0.06)] border border-[rgba(61,220,132,0.1)] px-3 py-1.5">
+          <span className="h-2 w-2 rounded-full bg-[#3DDC84] animate-pulse-glow" />
+          <span className="text-xs text-[rgba(245,247,245,0.5)]">🌿 All systems nominal</span>
         </div>
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="relative rounded-xl bg-slate-800/30 border border-slate-700/30 p-2 text-slate-400 hover:bg-slate-700/30 hover:text-slate-200 transition-all">
+        <button className="relative rounded-xl bg-[rgba(61,220,132,0.06)] border border-[rgba(61,220,132,0.1)] p-2 text-[rgba(245,247,245,0.4)] hover:bg-[rgba(61,220,132,0.12)] hover:text-[#3DDC84] transition-all">
           <Bell size={18} />
-          <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-ryzen-400 ring-2 ring-slate-900" />
+          <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-[#3DDC84] ring-2 ring-[#0B0F0C]" />
         </button>
 
         <div className="relative">
           <button
             onClick={() => setShowDropdown(!showDropdown)}
-            className="flex items-center gap-2 rounded-xl bg-slate-800/30 border border-slate-700/30 px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-700/30 hover:text-slate-100 transition-all"
+            className="flex items-center gap-2 rounded-xl bg-[rgba(61,220,132,0.06)] border border-[rgba(61,220,132,0.1)] px-3 py-1.5 text-sm text-[rgba(245,247,245,0.7)] hover:bg-[rgba(61,220,132,0.12)] hover:text-[#F5F7F5] transition-all"
           >
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-ryzen-500 to-red-600 text-xs font-bold text-white shadow-sm">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#3DDC84] to-[#1FA855] text-xs font-bold text-[#0B0F0C] shadow-sm">
               {user?.username?.charAt(0).toUpperCase() || "U"}
             </div>
             <span className="hidden sm:inline">{user?.username || "Loading..."}</span>
@@ -49,30 +49,30 @@ export function Navbar() {
           {showDropdown && (
             <>
               <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
-              <div className="absolute right-0 top-full mt-2 z-50 w-56 rounded-2xl border border-slate-700/50 bg-slate-900/95 backdrop-blur-xl p-2 shadow-2xl shadow-slate-950/50">
-                <div className="border-b border-slate-800/50 px-3 py-3">
-                  <p className="text-sm font-medium text-white">{user?.username}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{user?.email}</p>
+              <div className="absolute right-0 top-full mt-2 z-50 w-56 rounded-2xl border border-[rgba(61,220,132,0.15)] bg-[rgba(11,15,12,0.95)] backdrop-blur-xl p-2 shadow-2xl shadow-black/50">
+                <div className="border-b border-[rgba(61,220,132,0.08)] px-3 py-3">
+                  <p className="text-sm font-medium text-[#F5F7F5]">{user?.username}</p>
+                  <p className="text-xs text-[rgba(245,247,245,0.4)] mt-0.5">{user?.email}</p>
                   {user?.role === "ADMIN" && (
-                    <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-ryzen-500/10 px-2 py-0.5 text-[10px] font-medium text-ryzen-400 border border-ryzen-500/20">
+                    <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-[rgba(61,220,132,0.1)] px-2 py-0.5 text-[10px] font-medium text-[#3DDC84] border border-[rgba(61,220,132,0.2)]">
                       <Shield size={10} /> Admin
                     </span>
                   )}
                 </div>
                 <div className="mt-1 space-y-1">
                   <Link href="/settings" onClick={() => setShowDropdown(false)}
-                    className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 transition-colors">
+                    className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-[rgba(245,247,245,0.5)] hover:bg-[rgba(61,220,132,0.08)] hover:text-[#3DDC84] transition-colors">
                     <User size={15} /> Profile Settings
                   </Link>
                   {user?.role === "ADMIN" && (
                     <Link href="/admin" onClick={() => setShowDropdown(false)}
-                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 transition-colors">
+                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-[rgba(245,247,245,0.5)] hover:bg-[rgba(61,220,132,0.08)] hover:text-[#3DDC84] transition-colors">
                       <Shield size={15} /> Admin Panel
                     </Link>
                   )}
-                  <div className="border-t border-slate-800/50 my-1" />
+                  <div className="border-t border-[rgba(61,220,132,0.08)] my-1" />
                   <button onClick={handleLogout}
-                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors">
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-[#EF4444] hover:bg-[rgba(239,68,68,0.1)] transition-colors">
                     <LogOut size={15} /> Sign Out
                   </button>
                 </div>
